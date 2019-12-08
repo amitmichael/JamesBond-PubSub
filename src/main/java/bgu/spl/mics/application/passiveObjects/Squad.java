@@ -23,10 +23,10 @@ public class Squad {
 	/**
 	 * Initializes the squad. This method adds all the agents to the squad.
 	 * <p>
-	 * @param inventory 	Data structure containing all data necessary for initialization
+	 * @param agents 	Data structure containing all data necessary for initialization
 	 * 						of the squad.
 	 */
-	public void load (Agent[] inventory) {
+	public void load (Agent[] agents) {
 		// TODO Implement this
 	}
 

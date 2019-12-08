@@ -37,7 +37,7 @@ public class Inventory {
      * @param gadget 		Name of the gadget to check if available
      * @return 	‘false’ if the gadget is missing, and ‘true’ otherwise
      */
-	boolean getItem(String gadget){
+	public boolean getItem(String gadget){
 		//TODO: Implement this
 		return true;
 	}
