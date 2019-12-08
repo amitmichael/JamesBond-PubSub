@@ -1,5 +1,9 @@
 package bgu.spl.mics;
 
+import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * The {@link MessageBrokerImpl class is the implementation of the MessageBroker interface.
  * Write your implementation here!
@@ -7,12 +11,21 @@ package bgu.spl.mics;
  */
 public class MessageBrokerImpl implements MessageBroker {
 
+	private static final MessageBrokerImpl INSTANCE = new MessageBrokerImpl();
+
+	private static final ReentrantLock exampleLock = new ReentrantLock();
+	private static final ReentrantLock exampleLock2 = new ReentrantLock();
+	private LinkedList<String> exampleQueue = new LinkedList<>();
+	private BlockingQueue<Event> MREQueue;
+
+	private MessageBrokerImpl() {}
+
 	/**
 	 * Retrieves the single instance of this class.
 	 */
 	public static MessageBroker getInstance() {
 		//TODO: Implement this
-		return null;
+		return INSTANCE;
 	}
 
 	@Override
@@ -61,6 +74,18 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
 		// TODO Auto-generated method stub
+
+//		synchronized (INSTANCE)
+//		{
+		exampleLock.lock();
+
+			if (!exampleQueue.isEmpty())
+			{
+				//return exampleQueue.removeFirst();
+			}
+
+		exampleLock.unlock();
+//		}
 		return null;
 	}
 
