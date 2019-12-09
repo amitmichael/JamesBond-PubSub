@@ -1,5 +1,12 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,12 +19,24 @@ import java.util.List;
  */
 public class Inventory {
 	private List<String> gadgets;
+	private static Inventory inventoryInstance = null;
+
+	/**
+	 * constructor
+	 */
+
+	private Inventory(){
+		gadgets = new LinkedList<String>();
+	}
+
 	/**
      * Retrieves the single instance of this class.
      */
+
 	public static Inventory getInstance() {
-		//TODO: Implement this
-		return null;
+		if (inventoryInstance == null)
+			inventoryInstance = new Inventory();
+		return inventoryInstance;
 	}
 
 	/**
@@ -28,7 +47,9 @@ public class Inventory {
      * 						of the inventory.
      */
 	public void load (String[] inventory) {
-		//TODO: Implement this
+		for (int i=0;i < inventory.length; i++){
+			gadgets.add(inventory[i]);
+		}
 	}
 	
 	/**
@@ -38,8 +59,9 @@ public class Inventory {
      * @return 	‘false’ if the gadget is missing, and ‘true’ otherwise
      */
 	public boolean getItem(String gadget){
-		//TODO: Implement this
-		return true;
+		if (gadget != null)
+			return gadgets.contains(gadget);
+		else return false;
 	}
 
 	/**
@@ -50,6 +72,18 @@ public class Inventory {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		//TODO: Implement this
+		if (!filename.contains(".json"))
+			System.out.println("file name is not from type json");
+
+		else {
+			File file = new File(filename);
+			if (file.exists()) // if file with the same name already exists print error
+				System.out.println("file name " + filename +  " already exists");
+			Gson gson = new GsonBuilder().create();
+			try (FileWriter fw = new FileWriter(filename)) { //write the gadgets to json file
+				gson.toJson(gadgets, fw);
+			} catch (IOException e) {
+			}
+		}
 	}
 }

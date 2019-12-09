@@ -20,7 +20,6 @@ public class MI6Runner {
 
 
         if (args.length >0){
-            Inventory inventory = new Inventory();
            try {
                JsonReader reader = new JsonReader(new FileReader(args[0]));
                //String[] toLoad = new Gson().fromJson(reader,String[].class);
