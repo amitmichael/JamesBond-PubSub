@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MessageBrokerTest {
     MessageBroker MessageBroker;
-    Event<?> MissionRecievedEvent;
+    Event<String> MissionRecievedEvent;
 
     @BeforeEach
     public void setUp() {
@@ -28,7 +28,7 @@ public class MessageBrokerTest {
     public void subscribeEventtest() {
         Subscriber sb = new M();
         MissionRecievedEvent = new MissionReceivedEvent<String>();
-     //   MessageBroker.subscribeEvent(MissionRecievedEvent.getClass(), sb);
+        //MessageBroker.subscribeEvent(MissionRecievedEvent.getClass(), sb);
     }
 
     public <T> void completeTest() {

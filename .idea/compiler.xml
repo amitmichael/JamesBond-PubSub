@@ -6,8 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Ass2" />
         <module name="untitled" />
+        <module name="Ass2_New" />
+        <module name="Ass2" />
       </profile>
     </annotationProcessing>
   </component>
