@@ -24,6 +24,12 @@ public class SquadTest {
     }
 
     @Test
+    public void getInstancetest(){
+        assertNotEquals(null,sq);
+    }
+
+
+    @Test
     public void loadtest() {
         Agent[] agarray = {ag1, ag2};
         sq.load(agarray);
