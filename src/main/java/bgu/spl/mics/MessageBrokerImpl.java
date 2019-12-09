@@ -11,12 +11,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MessageBrokerImpl implements MessageBroker {
 
-	private static final MessageBrokerImpl INSTANCE = new MessageBrokerImpl();
+	private static MessageBroker MessageBrokerInstance = null;
 
-	private static final ReentrantLock exampleLock = new ReentrantLock();
-	private static final ReentrantLock exampleLock2 = new ReentrantLock();
-	private LinkedList<String> exampleQueue = new LinkedList<>();
-	private BlockingQueue<Event> MREQueue;
+	//private static final ReentrantLock exampleLock = new ReentrantLock();
+	//private static final ReentrantLock exampleLock2 = new ReentrantLock();
+	//private LinkedList<String> exampleQueue = new LinkedList<>();
+	//private BlockingQueue<Event> MREQueue;
 
 	private MessageBrokerImpl() {}
 
@@ -24,8 +24,9 @@ public class MessageBrokerImpl implements MessageBroker {
 	 * Retrieves the single instance of this class.
 	 */
 	public static MessageBroker getInstance() {
-		//TODO: Implement this
-		return INSTANCE;
+		if (MessageBrokerInstance ==null)
+			MessageBrokerInstance = new MessageBrokerImpl();
+		return MessageBrokerInstance;
 	}
 
 	@Override
@@ -77,14 +78,14 @@ public class MessageBrokerImpl implements MessageBroker {
 
 //		synchronized (INSTANCE)
 //		{
-		exampleLock.lock();
+		//exampleLock.lock();
 
-			if (!exampleQueue.isEmpty())
-			{
+		//	if (!exampleQueue.isEmpty())
+		//	{
 				//return exampleQueue.removeFirst();
-			}
+		//	}
 
-		exampleLock.unlock();
+	//	exampleLock.unlock();
 //		}
 		return null;
 	}

@@ -7,12 +7,24 @@ package bgu.spl.mics.application.passiveObjects;
  * You may add ONLY private fields and methods to this class.
  */
 public class Agent {
+	String name;
+	String SerialNumber;
+
+	/**
+	 * constructor
+	 * @param name
+	 * @param SerialNumber
+	 */
+	public Agent(String name, String SerialNumber){
+		this.name= name;
+		this.SerialNumber = SerialNumber;
+	}
 
 	/**
 	 * Sets the serial number of an agent.
 	 */
 	public void setSerialNumber(String serialNumber) {
-		// TODO Implement this
+		this.SerialNumber=serialNumber;
 	}
 
 	/**
@@ -21,15 +33,15 @@ public class Agent {
      * @return The serial number of an agent.
      */
 	public String getSerialNumber() {
-		// TODO Implement this
-		return null;
+
+		return this.SerialNumber;
 	}
 
 	/**
 	 * Sets the name of the agent.
 	 */
 	public void setName(String name) {
-		// TODO Implement this
+		this.name = name;
 	}
 
 	/**
@@ -38,8 +50,7 @@ public class Agent {
      * @return the name of the agent.
      */
 	public String getName() {
-		// TODO Implement this
-		return null;
+		return this.name;
 	}
 
 	/**
