@@ -1,5 +1,13 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.jsonParser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -11,16 +19,29 @@ import java.util.List;
  * You can add ONLY private fields and methods to this class as you see fit.
  */
 public class Diary {
+	private static Diary diaryInstance = null;
+	private List<Report> reports;
+
+	/**
+	 * constructor
+	 */
+
+	private Diary(){
+		reports = new LinkedList<Report>();
+	}
+
+
 	/**
 	 * Retrieves the single instance of this class.
 	 */
 	public static Diary getInstance() {
-		//TODO: Implement this
-		return null;
+		if (diaryInstance == null)
+			diaryInstance = new Diary();
+		return diaryInstance;
 	}
 
 	public List<Report> getReports() {
-		return null;
+		return reports;
 	}
 
 	/**
@@ -28,7 +49,7 @@ public class Diary {
 	 * @param reportToAdd - the report to add
 	 */
 	public void addReport(Report reportToAdd){
-		//TODO: Implement this
+		reports.add(reportToAdd);
 	}
 
 	/**
@@ -39,7 +60,8 @@ public class Diary {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		//TODO: Implement this
+		jsonParser json = new jsonParser(filename);
+		json.printTofile(reports);
 	}
 
 	/**
