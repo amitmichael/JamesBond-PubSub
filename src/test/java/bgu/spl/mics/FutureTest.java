@@ -46,6 +46,7 @@ public class FutureTest {
 
     @Test
     public void isDonetest2(){
+        resolvetest();
         future.resolve("Done");
         assertTrue(future.isDone());
     }
