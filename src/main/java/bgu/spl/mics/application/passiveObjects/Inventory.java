@@ -84,6 +84,7 @@ public class Inventory {
 				gson.toJson(gadgets, fw);
 			} catch (IOException e) {
 			}
+
 		}
 	}
 }

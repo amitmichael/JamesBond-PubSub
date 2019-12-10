@@ -1,9 +1,12 @@
 package bgu.spl.mics;
 
 
-public class MissionReceivedEvent<T> implements Event<T> {
+public class MissionReceivedEvent implements Event<String> {
     private String msg;
 
-    public void MissionReceivedEvent(){}
+    public MissionReceivedEvent(String msg)
+    {
+        this.msg = msg;
+    }
 
 }

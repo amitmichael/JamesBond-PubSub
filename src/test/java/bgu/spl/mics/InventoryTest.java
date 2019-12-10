@@ -3,12 +3,14 @@ package bgu.spl.mics;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Wrapper;
 import java.util.LinkedList;
 
@@ -47,7 +49,6 @@ public class InventoryTest {
         File file = new File(filename);
         inv.printToFile(filename);
         assertTrue(file.exists());
-        file.delete();
     }
 
     @Test
@@ -61,10 +62,20 @@ public class InventoryTest {
             String[] data = gson.fromJson(reader, String[].class);
             assertTrue(data[0].equals("amit"));
             assertTrue(data[1].equals("shachaf"));
-            file.delete();
-        } catch (FileNotFoundException e) {}
+            reader.close();
+        } catch (FileNotFoundException e) {} catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    @AfterAll
+    public static void deletefiles(){
+        File file1 = new File("printtoFileTest1.json");
+        file1.delete();
+        File file2 = new File("printtoFileTest2.json");
+        file2.delete();
+
+    }
 
 
 }

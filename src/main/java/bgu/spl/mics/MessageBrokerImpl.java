@@ -27,6 +27,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		if (MessageBrokerInstance ==null)
 			MessageBrokerInstance = new MessageBrokerImpl();
 		return MessageBrokerInstance;
+
 	}
 
 	@Override
@@ -90,6 +91,6 @@ public class MessageBrokerImpl implements MessageBroker {
 		return null;
 	}
 
-	
+
 
 }

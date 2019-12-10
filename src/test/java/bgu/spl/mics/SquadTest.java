@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,6 +34,9 @@ public class SquadTest {
     public void loadtest() {
         Agent[] agarray = {ag1, ag2};
         sq.load(agarray);
+        Map<Agent,String > map = sq.getSquadMap(); // return the agent Map
+        assertTrue(map.containsKey("007"));
+        assertFalse(map.containsKey("002"));
     }
 
     @Test
