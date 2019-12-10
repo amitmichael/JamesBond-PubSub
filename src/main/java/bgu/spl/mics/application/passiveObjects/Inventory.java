@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.jsonParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -72,19 +73,9 @@ public class Inventory {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		if (!filename.contains(".json"))
-			System.out.println("file name is not from type json");
 
-		else {
-			File file = new File(filename);
-			if (file.exists()) // if file with the same name already exists print error
-				System.out.println("file name " + filename +  " already exists");
-			Gson gson = new GsonBuilder().create();
-			try (FileWriter fw = new FileWriter(filename)) { //write the gadgets to json file
-				gson.toJson(gadgets, fw);
-			} catch (IOException e) {
-			}
+		jsonParser json = new jsonParser(filename);
+		json.printTofile(gadgets);
 
-		}
 	}
 }
