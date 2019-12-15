@@ -1,8 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Passive data-object representing a information about an agent in MI6.
@@ -13,7 +12,8 @@ import java.util.Map;
 public class Squad {
 
 	private Map<String, Agent> agents; //key serial number, value agent
-	private static Squad squadInstance = null;
+	private static class singletonHolder{
+	private static Squad squadInstance = new Squad();}
 
 	/**
 	 * Retrieves the single instance of this class.
@@ -24,10 +24,7 @@ public class Squad {
 	}
 
 	public static Squad getInstance() {
-		if (squadInstance == null)
-			squadInstance = new Squad();
-
-		return squadInstance;
+		return singletonHolder.squadInstance;
 	}
 
 	/**
@@ -46,15 +43,19 @@ public class Squad {
 	 * Releases agents.
 	 */
 	public void releaseAgents(List<String> serials){
-		// TODO Implement this
+		Iterator iter=serials.iterator();
+		while (iter.hasNext()){
+			agents.get(iter.next()).release();
+		}
 	}
 
 	/**
 	 * simulates executing a mission by calling sleep.
 	 * @param time   milliseconds to sleep
 	 */
-	public void sendAgents(List<String> serials, int time){
-		// TODO Implement this
+	public void sendAgents(List<String> serials, int time) throws InterruptedException { //@amit added that exception
+		if(getAgents(serials))
+			sleep(time);
 	}
 
 	/**
@@ -63,8 +64,15 @@ public class Squad {
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
 	public boolean getAgents(List<String> serials){
-		// TODO Implement this
-		return false;
+		boolean done=true;
+		Iterator iter=serials.iterator();
+		while (iter.hasNext()&done){
+			Agent next=agents.get(iter.next());
+			if (!agents.get(next).isAvailable())
+				done=false;
+			else next.acquire();
+		}
+		return done;
 	}
 
     /**

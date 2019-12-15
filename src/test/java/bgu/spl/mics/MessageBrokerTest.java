@@ -10,8 +10,8 @@ import java.util.Queue;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MessageBrokerTest {
-    MessageBroker broker;
-/*
+  /*  MessageBroker broker;
+
     @BeforeEach
     public void setUp() {
         broker = MessageBrokerImpl.getInstance();
@@ -95,6 +95,6 @@ public class MessageBrokerTest {
         broker.complete(ms,"blabla");
         assertTrue(future.isDone()); //resolved
     }
-    */
 
+*/
 }

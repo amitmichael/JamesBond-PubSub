@@ -2,6 +2,7 @@ package bgu.spl.mics;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import jdk.internal.net.http.common.Pair;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,6 +11,8 @@ import java.util.List;
 
 public class jsonParser {
     private String fileName;
+   // private List<String> Inventory;
+   // private List<Pair<String,String>> squad;
 
     public jsonParser(String fileName){
         this.fileName = fileName;
