@@ -1,5 +1,13 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.jsonParser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,12 +20,24 @@ import java.util.List;
  */
 public class Inventory {
 	private List<String> gadgets;
+	private static Inventory inventoryInstance = null;
+
+	/**
+	 * constructor
+	 */
+
+	private Inventory(){
+		gadgets = new LinkedList<String>();
+	}
+
 	/**
      * Retrieves the single instance of this class.
      */
+
 	public static Inventory getInstance() {
-		//TODO: Implement this
-		return null;
+		if (inventoryInstance == null)
+			inventoryInstance = new Inventory();
+		return inventoryInstance;
 	}
 
 	/**
@@ -28,7 +48,9 @@ public class Inventory {
      * 						of the inventory.
      */
 	public void load (String[] inventory) {
-		//TODO: Implement this
+		for (int i=0;i < inventory.length; i++){
+			gadgets.add(inventory[i]);
+		}
 	}
 	
 	/**
@@ -37,9 +59,10 @@ public class Inventory {
      * @param gadget 		Name of the gadget to check if available
      * @return 	‘false’ if the gadget is missing, and ‘true’ otherwise
      */
-	boolean getItem(String gadget){
-		//TODO: Implement this
-		return true;
+	public boolean getItem(String gadget){
+		if (gadget != null)
+			return gadgets.contains(gadget);
+		else return false;
 	}
 
 	/**
@@ -50,6 +73,9 @@ public class Inventory {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		//TODO: Implement this
+
+		jsonParser json = new jsonParser(filename);
+		json.printTofile(gadgets);
+
 	}
 }

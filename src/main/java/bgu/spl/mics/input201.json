@@ -1,0 +1,87 @@
+{
+    "inventory": [ 
+        "Sky Hook",
+        "Geiger counter",
+        "X-ray glasses",
+        "Dagger shoe"
+    ],
+    "services": {
+        "M": 2,
+        "Moneypenny": 2,
+        "intelligence": [
+            {
+                "missions": [
+                    {
+                        "agents": [
+                            {
+                                "serialNumber": "006"
+                            },
+                            {
+                                "serialNumber": "007"
+                            }
+                        ],
+                        "duration": 7,
+                        "gadget": "Sky Hook",
+                        "name": "Thunderball",
+                        "timeExpired": 15,
+                        "timeIssued": 3
+                    },
+                    {
+                        "agent": "007",
+                        "duration": 2,
+                        "gadget": "Dagger shoe",
+                        "name": "From Russia With Love",
+                        "timeExpired": 8,
+                        "timeIssued": 6
+                    },
+                    {
+                        "agent": "007",
+                        "duration": 2,
+                        "gadget": "Dagger shoe",
+                        "name": "From Russia With Love",
+                        "timeExpired": 100,
+                        "timeIssued": 15
+                    },
+                    {
+                        "agent": "006",
+                        "duration": 2,
+                        "gadget": "X-ray Glasses",
+                        "name": "The World Is Not Enough",
+                        "timeExpired": 100,
+                        "timeIssued": 16
+                    }
+                ]
+            },
+            {
+                "missions": [
+                    {
+                        "agents": [
+                            {
+                                "serialNumber": "007"
+                            },
+                            {
+                                "serialNumber": "006"
+                            }
+                        ],
+                        "duration": 7,
+                        "gadget": "Sky Hook",
+                        "name": "Thunderball",
+                        "timeExpired": 15,
+                        "timeIssued": 3
+                    }
+                ]
+            }
+        ],
+        "time": 25
+    },
+    "squad": [
+        {
+            "name": "James Bond",
+            "serialNumber": "007"
+        },
+        {
+            "name": "Alec Trevelyan",
+            "serialNumber": "006"
+        }
+    ]
+}
