@@ -9,6 +9,8 @@ import java.util.List;
  * You may add ONLY private fields and methods to this class.
  */
 public class MissionInfo {
+	private String missionName;
+	private String gadget;
 
 	private String missionName;
 	private String gadget=null;
@@ -22,6 +24,7 @@ public class MissionInfo {
      */
     public void setMissionName(String missionName) {
 		this.missionName= missionName;
+
     }
 
 	/**
@@ -29,6 +32,7 @@ public class MissionInfo {
      */
 	public String getMissionName() {
 		return missionName;
+
 	}
 
     /**
@@ -50,6 +54,7 @@ public class MissionInfo {
      */
     public void setGadget(String gadget) {
     	this.gadget=gadget;
+
     }
 
 	/**
@@ -57,6 +62,7 @@ public class MissionInfo {
      */
 	public String getGadget() {
 		return gadget;
+
 	}
 
     /**
