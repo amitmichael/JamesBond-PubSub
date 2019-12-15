@@ -1,13 +1,11 @@
 package bgu.spl.mics.application.publishers;
-import bgu.spl.mics.MessageBroker;
-import bgu.spl.mics.MessageBrokerImpl;
-import bgu.spl.mics.Publisher;
-import bgu.spl.mics.TickBroadcast;
+import bgu.spl.mics.*;
 
 import java.sql.Time;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TimeService is the global system timer There is only one instance of this Publisher.
@@ -23,6 +21,9 @@ public class TimeService extends Publisher {
 	private int count;
 	private Timer timer;
 	private TimerTask task;
+	private LogManager logM = LogManager.getInstance();
+	private AtomicBoolean running = new AtomicBoolean(false);
+
 
 
 	/**
@@ -37,24 +38,32 @@ public class TimeService extends Publisher {
 		task = new TimerTask() {
 			@Override
 			public synchronized void run() {
-				if (count <= termination) {
-					getSimplePublisher().sendBroadcast(new TickBroadcast());
-					System.out.println("Sending Broadcast msg #" + count + " Time: " + System.currentTimeMillis());
-					count++;
+				while (running.get()) {
+					if (count <= termination) {
+						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());
+						getSimplePublisher().sendBroadcast(toSend);
+						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
+						count++;
+					}
+					else {
+						interrupt();
+					}
 				}
 			}
 		};
 	}
 
-
 	@Override
 	protected void initialize() { // ???
 		// TODO Implement this
-		
+	}
+	public  void interrupt() {
+		running.set(false);
 	}
 
 	@Override
 	public void run() {
+		running.set(true);
 		timer.schedule(task, 0, 100);
 	}
 }
