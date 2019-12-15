@@ -19,8 +19,10 @@ import java.util.List;
  * You can add ONLY private fields and methods to this class as you see fit.
  */
 public class Diary {
-	private static Diary diaryInstance = null;
+	private static class singletonHolder{
+	private static Diary diaryInstance = new Diary();}
 	private List<Report> reports;
+	int total;
 
 	/**
 	 * constructor
@@ -28,6 +30,7 @@ public class Diary {
 
 	private Diary(){
 		reports = new LinkedList<Report>();
+		total=0;
 	}
 
 
@@ -35,9 +38,7 @@ public class Diary {
 	 * Retrieves the single instance of this class.
 	 */
 	public static Diary getInstance() {
-		if (diaryInstance == null)
-			diaryInstance = new Diary();
-		return diaryInstance;
+		return singletonHolder.diaryInstance;
 	}
 
 	public List<Report> getReports() {
@@ -50,6 +51,7 @@ public class Diary {
 	 */
 	public void addReport(Report reportToAdd){
 		reports.add(reportToAdd);
+		total++;
 	}
 
 	/**
@@ -69,7 +71,6 @@ public class Diary {
 	 * @return the total number of received missions (executed / aborted) be all the M-instances.
 	 */
 	public int getTotal(){
-		//TODO: Implement this
-		return 0;
+		return total;
 	}
 }

@@ -7,8 +7,9 @@ package bgu.spl.mics.application.passiveObjects;
  * You may add ONLY private fields and methods to this class.
  */
 public class Agent {
-	String name;
-	String SerialNumber;
+	private String name;
+	private String SerialNumber;
+	private boolean available;
 
 	/**
 	 * constructor
@@ -18,6 +19,7 @@ public class Agent {
 	public Agent(String name, String SerialNumber){
 		this.name= name;
 		this.SerialNumber = SerialNumber;
+		available =true;
 	}
 
 	/**
@@ -59,21 +61,20 @@ public class Agent {
      * @return if the agent is available.
      */
 	public boolean isAvailable() {
-		// TODO Implement this
-		return false;
+		return available;
 	}
 
 	/**
 	 * Acquires an agent.
 	 */
 	public void acquire(){
-		// TODO Implement this
+		available =false;
 	}
 
 	/**
 	 * Releases an agent.
 	 */
 	public void release(){
-		// TODO Implement this
+		available =true;
 	}
 }

@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class Inventory {
 	private List<String> gadgets;
-	private static Inventory inventoryInstance = null;
+	private static class singletonHolder{
+	private static Inventory inventoryInstance = new Inventory();}
 
 	/**
 	 * constructor
@@ -35,9 +36,7 @@ public class Inventory {
      */
 
 	public static Inventory getInstance() {
-		if (inventoryInstance == null)
-			inventoryInstance = new Inventory();
-		return inventoryInstance;
+		return singletonHolder.inventoryInstance;
 	}
 
 	/**

@@ -9,49 +9,68 @@ import java.util.List;
  * You may add ONLY private fields and methods to this class.
  */
 public class Report {
+	private String missionName;
+	private int m;
+	private int moneyPenny;
+	private List<String> agentsSerialNumbers;
+	private List<String> agentsNames;
+	private String gadgetName;
+	int timeIssued;
+	int qTime;
+	int timeCreated;
+
+	public Report(String missionName,int m,int moneyPenny,List<String> agentsSerialNumbers,List<String> agentsNames,String gadgetName,int timeIssued, int qTime, int timeCreated){
+		this.missionName=missionName;
+		this.m=m;
+		this.moneyPenny=moneyPenny;
+		this.agentsSerialNumbers=agentsSerialNumbers;
+		this.agentsNames=agentsNames;
+		this.gadgetName=gadgetName;
+		this.qTime=qTime;
+		this.timeIssued=timeIssued;
+		this.timeCreated=timeCreated;
+	}
+
 	/**
      * Retrieves the mission name.
      */
 	public String getMissionName() {
-		// TODO Implement this
-		return null;
+		return missionName;
 	}
 
 	/**
 	 * Sets the mission name.
 	 */
 	public void setMissionName(String missionName) {
-		// TODO Implement this
+		this.missionName=missionName;
 	}
 
 	/**
 	 * Retrieves the M's id.
 	 */
 	public int getM() {
-		// TODO Implement this
-		return 0;
+		return m;
 	}
 
 	/**
 	 * Sets the M's id.
 	 */
 	public void setM(int m) {
-		// TODO Implement this
+		this.m=m;
 	}
 
 	/**
 	 * Retrieves the Moneypenny's id.
 	 */
 	public int getMoneypenny() {
-		// TODO Implement this
-		return 0;
+		return moneyPenny;
 	}
 
 	/**
 	 * Sets the Moneypenny's id.
 	 */
 	public void setMoneypenny(int moneypenny) {
-		// TODO Implement this
+		this.moneyPenny=moneypenny;
 	}
 
 	/**
@@ -60,15 +79,14 @@ public class Report {
 	 * @return The serial numbers of the agents.
 	 */
 	public List<String> getAgentsSerialNumbersNumber() {
-		// TODO Implement this
-		return null;
+		return agentsSerialNumbers;
 	}
 
 	/**
 	 * Sets the serial numbers of the agents.
 	 */
 	public void setAgentsSerialNumbersNumber(List<String> agentsSerialNumbersNumber) {
-		// TODO Implement this
+		this.agentsSerialNumbers=agentsSerialNumbers;
 	}
 
 	/**
@@ -77,15 +95,14 @@ public class Report {
 	 * @return The agents names.
 	 */
 	public List<String> getAgentsNames() {
-		// TODO Implement this
-		return null;
+		return agentsNames;
 	}
 
 	/**
 	 * Sets the agents names.
 	 */
 	public void setAgentsNames(List<String> agentsNames) {
-		// TODO Implement this
+		this.agentsNames=agentsNames;
 	}
 
 	/**
@@ -94,59 +111,55 @@ public class Report {
 	 * @return the name of the gadget.
 	 */
 	public String getGadgetName() {
-		// TODO Implement this
-		return null;
+		return gadgetName;
 	}
 
 	/**
 	 * Sets the name of the gadget.
 	 */
 	public void setGadgetName(String gadgetName) {
-		// TODO Implement this
+		this.gadgetName=gadgetName;
 	}
 
 	/**
 	 * Retrieves the time-tick in which Q Received the GadgetAvailableEvent for that mission.
 	 */
 	public int getQTime() {
-		// TODO Implement this
-		return 0;
+		return qTime;
 	}
 
 	/**
 	 * Sets the time-tick in which Q Received the GadgetAvailableEvent for that mission.
 	 */
 	public void setQTime(int qTime) {
-		// TODO Implement this
+		this.qTime=qTime;
 	}
 
 	/**
 	 * Retrieves the time when the mission was sent by an Intelligence Publisher.
 	 */
 	public int getTimeIssued() {
-		// TODO Implement this
-		return 0;
+		return timeIssued;
 	}
 
 	/**
 	 * Sets the time when the mission was sent by an Intelligence Publisher.
 	 */
 	public void setTimeIssued(int timeIssued) {
-		// TODO Implement this
+		this.timeIssued=timeIssued;
 	}
 
 	/**
 	 * Retrieves the time-tick when the report has been created.
 	 */
 	public int getTimeCreated() {
-		// TODO Implement this
-		return 0;
+		return timeCreated;
 	}
 
 	/**
 	 * Sets the time-tick when the report has been created.
 	 */
 	public void setTimeCreated(int timeCreated) {
-		// TODO Implement this
+		this.timeCreated=timeCreated;
 	}
 }
