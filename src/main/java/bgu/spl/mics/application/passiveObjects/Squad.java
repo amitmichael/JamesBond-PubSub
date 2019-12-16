@@ -2,6 +2,7 @@ package bgu.spl.mics.application.passiveObjects;
 import bgu.spl.mics.LogManager;
 
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 import static java.lang.Thread.sleep;
 
@@ -57,13 +58,16 @@ public class Squad {
 	 * simulates executing a mission by calling sleep.
 	 * @param time   milliseconds to sleep
 	 */
-	public void sendAgents(List<String> serials, int time) throws InterruptedException { //@amit added that exception
+	public void sendAgents(List<String> serials, int time) throws InterruptedException, TimeoutException { //@amit added that exception
 		 if (getAgents(serials)){
 			 sleep(time);
 			 releaseAgents(serials);
 		}
-		 else
-		 	logM.log.severe("getAgent is false - some agent is missing");
+		 else {
+			 logM.log.severe("getAgent is false - some agent is missing");
+			 throw new TimeoutException("TIMEOUT"){};
+
+		 }
 	}
 
 	/**
