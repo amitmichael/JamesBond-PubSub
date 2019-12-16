@@ -25,7 +25,6 @@ public class TimeService extends Publisher {
 	private AtomicBoolean running = new AtomicBoolean(false);
 
 
-
 	/**
 	 *
 	 * @param duration the number of ticks before termination
@@ -37,7 +36,7 @@ public class TimeService extends Publisher {
 		timer = new Timer();
 		task = new TimerTask() {
 			@Override
-			public synchronized void run() {
+			public  void run() {
 				while (running.get()) {
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());

@@ -23,7 +23,7 @@ public class MI6Runner {
     public static void main(String[] args) {
         // TODO Implement this
         Inventory inv = Inventory.getInstance();
-        if (args[0] == null) {
+        if (args.length ==0) {
             throw new NullPointerException("Enter input json path in program arguments");
         } else {
             String[] arr = jsonHandler.parseSection("inventory", args[0]); //"src/main/java/bgu/spl/mics/input201.json"
