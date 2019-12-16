@@ -58,8 +58,12 @@ public class Squad {
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time) throws InterruptedException { //@amit added that exception
-		if(getAgents(serials))
-			sleep(time);
+		 if (getAgents(serials)){
+			 sleep(time);
+			 releaseAgents(serials);
+		}
+		 else
+		 	logM.log.severe("getAgent is false - some agent is missing");
 	}
 
 	/**
@@ -72,10 +76,14 @@ public class Squad {
 		Iterator iter=serials.iterator();
 		while (iter.hasNext()&done){
 			Agent next=agents.get(iter.next());
-			if (!agents.get(next).isAvailable())
+			if (!this.agents.containsKey(next.getSerialNumber())){ // agent is not in the squad
 				done=false;
-			else next.acquire();
+				logM.log.severe("agent " + next.getSerialNumber() + " is not in the squad");
+			}
+			else
+				next.acquire();
 		}
+
 		return done;
 	}
 

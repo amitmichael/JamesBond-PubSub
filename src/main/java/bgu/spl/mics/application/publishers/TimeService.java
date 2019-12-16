@@ -36,15 +36,15 @@ public class TimeService extends Publisher {
 		timer = new Timer();
 		task = new TimerTask() {
 			@Override
-			public  void run() {
+			public synchronized void run() {
 				while (running.get()) {
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());
-						getSimplePublisher().sendBroadcast(toSend);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
+						getSimplePublisher().sendBroadcast(toSend);
 						count++;
 					}
-					else {
+					else { //??
 						interrupt();
 					}
 				}

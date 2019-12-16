@@ -71,7 +71,12 @@ public class Agent {
 	/**
 	 * Acquires an agent.
 	 */
-	public void acquire(){
+	public void acquire() throws InterruptedException {
+		while (available==false){
+			logM.log.info("Waiting for agent " + this.name + " to be available");
+			wait();
+		}
+		logM.log.info("agent " + this.name + " acquired");
 		available =false;
 	}
 
@@ -79,6 +84,9 @@ public class Agent {
 	 * Releases an agent.
 	 */
 	public void release(){
+		if (available==true)
+			logM.log.warning("release was called to available agent");
 		available =true;
+		notifyAll();
 	}
 }

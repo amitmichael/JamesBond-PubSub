@@ -14,12 +14,6 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	private static MessageBroker MessageBrokerInstance = null;
 	private ConcurrentHashMap<Class, ConcurrentHashMap> topics; // will hold all topics in the broker
-
-	//private static final ReentrantLock exampleLock = new ReentrantLock();
-	//private static final ReentrantLock exampleLock2 = new ReentrantLock();
-	//private LinkedList<String> exampleQueue = new LinkedList<>();
-	//private BlockingQueue<Event> MREQueue;
-
 	private MessageBrokerImpl() {
 		topics = new ConcurrentHashMap<Class, ConcurrentHashMap>();
 	}
@@ -63,7 +57,9 @@ public class MessageBrokerImpl implements MessageBroker {
 		}
 
 		ConcurrentHashMap distributionList = topics.get(b.getClass());
+
 		for (Object sub : distributionList.entrySet()){
+
 			sub.notify(); // ??
 			}
 		}
