@@ -12,4 +12,9 @@ public class TickBroadcast implements Broadcast {
     public long getTime(){
         return time;
     }
+
+    @Override
+    public void setFuture(Future fut) {
+
+    }
 }

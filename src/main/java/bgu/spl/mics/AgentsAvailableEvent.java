@@ -13,14 +13,14 @@ public class AgentsAvailableEvent implements Event<String> {
         this.serials=serials;
     }
 
-    public void setFut(Future fut){
-        this.fut=fut;
-    }
-
     public Future getFut(){
         return fut;
     }
     public List<String> getserials(){
         return serials;
+      
+    @Override
+    public void setFuture(Future fut) {
+
     }
 }
