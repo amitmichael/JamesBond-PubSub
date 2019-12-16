@@ -114,7 +114,6 @@ public abstract class Subscriber extends RunnableSubPub {
 
 
         while (!terminated) {
-            System.out.println("NOT IMPLEMENTED!!!"); //TODO: you should delete this line :)
             Message msg = null;
             try {
                 msg = MessageBrokerImpl.getInstance().awaitMessage(this);
