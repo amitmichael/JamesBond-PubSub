@@ -37,7 +37,6 @@ public class TimeService extends Publisher {
 		task = new TimerTask() {
 			@Override
 			public synchronized void run() {
-				while (running.get()) {
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
@@ -45,10 +44,10 @@ public class TimeService extends Publisher {
 						count++;
 					}
 					else { //??
-						interrupt();
+						timer.cancel();
 					}
 				}
-			}
+
 		};
 	}
 
@@ -56,13 +55,9 @@ public class TimeService extends Publisher {
 	protected void initialize() { // ???
 		// TODO Implement this
 	}
-	public  void interrupt() {
-		running.set(false);
-	}
 
 	@Override
 	public void run() {
-		running.set(true);
 		timer.schedule(task, 0, 100);
 	}
 }

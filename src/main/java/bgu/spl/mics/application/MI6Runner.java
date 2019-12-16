@@ -28,7 +28,7 @@ public class MI6Runner {
         } else {
             String[] arr = jsonHandler.parseSection("inventory", args[0]); //"src/main/java/bgu/spl/mics/input201.json"
             inv.load(arr);
-            TimeService tm = new TimeService(10);
+            TimeService tm = new TimeService(5);
             tm.run();
 
         }

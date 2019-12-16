@@ -85,7 +85,7 @@ public class Agent {
 	 */
 	public void release(){
 		if (available==true)
-			logM.log.warning("release was called to available agent");
+			logM.log.warning("release was called to available agent, agent:  " + name);
 		available =true;
 		notifyAll();
 	}

@@ -1,8 +1,12 @@
 package bgu.spl.mics;
 
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -13,9 +17,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageBrokerImpl implements MessageBroker {
 
 	private static MessageBroker MessageBrokerInstance = null;
-	private ConcurrentHashMap<Class, ConcurrentHashMap> topics; // will hold all topics in the broker
+	private ConcurrentHashMap<Class, LinkedList> topics; // will hold all topics in the broker
+	private ConcurrentHashMap<Subscriber, Queue<Message>> registered;
+	private LogManager logM = LogManager.getInstance();
 	private MessageBrokerImpl() {
-		topics = new ConcurrentHashMap<Class, ConcurrentHashMap>();
+		logM.log.info("MessageBroker constructor was called");
+		topics = new ConcurrentHashMap<Class, LinkedList>();
+		registered = new ConcurrentHashMap<Subscriber, Queue<Message>>();
 	}
 
 	/**
@@ -37,9 +45,9 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
 		if (!topics.containsKey(type)){ // if topic does not exists
-			topics.put(type,new ConcurrentHashMap<>());
+			topics.put(type,new LinkedList<Subscriber>());
 		}
-		topics.get(type).put(m.hashCode(),m); // add the subscriber to topic map
+		topics.get(type).add(m); // add the subscriber to topic list
 	}
 
 	@Override
@@ -53,14 +61,19 @@ public class MessageBrokerImpl implements MessageBroker {
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
 		if (!topics.containsKey(b.getClass())){
-			topics.put(b.getClass(), new ConcurrentHashMap());
+			topics.put(b.getClass(), new LinkedList<Subscriber>());
+			logM.log.info("topic " + b.getClass() + " added");
 		}
 
-		ConcurrentHashMap distributionList = topics.get(b.getClass());
+		LinkedList<Subscriber> distributionList = topics.get(b);
+		Iterator it = distributionList.iterator();
 
-		for (Object sub : distributionList.entrySet()){
-
-			sub.notify(); // ??
+		while (it.hasNext()){
+			Object curr = it.next();
+			Subscriber currsub = (Subscriber) curr;
+			registered.get(currsub).add(b); // add b to subscriber queue
+			logM.log.info("Broadcast msg added to "+ currsub.getName()  + " queue");
+			registered.get(currsub).notify();
 			}
 		}
 
@@ -73,7 +86,8 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void register(Subscriber m) {
-		// TODO Auto-generated method stub
+		registered.put(m,new ConcurrentLinkedQueue());
+		logM.log.info("Subscriber " + m.getName()+ " registered");
 
 	}
 
@@ -87,18 +101,14 @@ public class MessageBrokerImpl implements MessageBroker {
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
 		// TODO Auto-generated method stub
 
-//		synchronized (INSTANCE)
-//		{
-		//exampleLock.lock();
+		synchronized (registered.get(m)){
+			while (registered.get(m).isEmpty()){
+				logM.log.info(m.getName() + " waiting for msg");
+				wait();
+			}
+			return  registered.get(m).poll();
+		}
 
-		//	if (!exampleQueue.isEmpty())
-		//	{
-				//return exampleQueue.removeFirst();
-		//	}
-
-	//	exampleLock.unlock();
-//		}
-		return null;
 	}
 
 

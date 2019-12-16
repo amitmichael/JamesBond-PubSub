@@ -71,7 +71,7 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials){
+	public boolean getAgents(List<String> serials) throws InterruptedException {
 		boolean done=true;
 		Iterator iter=serials.iterator();
 		while (iter.hasNext()&done){
