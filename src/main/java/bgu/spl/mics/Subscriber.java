@@ -1,5 +1,7 @@
 package bgu.spl.mics;
 
+import java.util.HashMap;
+
 /**
  * The Subscriber is an abstract class that any subscriber in the system
  * must extend. The abstract Subscriber class is responsible to get and
@@ -18,6 +20,7 @@ package bgu.spl.mics;
 public abstract class Subscriber extends RunnableSubPub {
     private boolean terminated = false;
     private LogManager logM = LogManager.getInstance();
+    private HashMap<Class,Callback> callbackmap;
 
     /**
      * @param name the Subscriber name (used mainly for debugging purposes -
@@ -25,6 +28,7 @@ public abstract class Subscriber extends RunnableSubPub {
      */
     public Subscriber(String name) {
         super(name);
+        callbackmap = new HashMap<Class, Callback>();
     }
 
     /**
@@ -50,6 +54,7 @@ public abstract class Subscriber extends RunnableSubPub {
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
         MessageBrokerImpl.getInstance().subscribeEvent(type,this);
+        callbackmap.put(type,callback);
     }
 
     /**
@@ -104,9 +109,25 @@ public abstract class Subscriber extends RunnableSubPub {
      */
     @Override
     public final void run() {
-        initialize();
+
+            initialize();
+
+
         while (!terminated) {
             System.out.println("NOT IMPLEMENTED!!!"); //TODO: you should delete this line :)
+            Message msg = null;
+            try {
+                msg = MessageBrokerImpl.getInstance().awaitMessage(this);
+                logM.log.info("msg received to subscriber " + this.getName());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (callbackmap.containsKey(msg.getClass())) {
+                callbackmap.get(msg.getClass()).call(msg);//dont forget msg contains reference to future
+            }
+            else {
+                logM.log.warning("Callback not found");
+            }
         }
     }
 

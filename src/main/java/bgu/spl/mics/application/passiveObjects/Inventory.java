@@ -27,7 +27,7 @@ public class Inventory {
 
 	private Inventory(){
 		gadgets = new LinkedList<String>();
-		logM.log.info("Inventory instance construct");
+		logM.log.info("Inventory constructor was called");
 	}
 
 	/**
@@ -62,8 +62,9 @@ public class Inventory {
      * @return 	‘false’ if the gadget is missing, and ‘true’ otherwise
      */
 	public boolean getItem(String gadget){
-		if (gadget != null)
-			return gadgets.contains(gadget);
+		if (gadget != null) {
+			return gadgets.remove(gadget);
+		}
 		else return false;
 	}
 

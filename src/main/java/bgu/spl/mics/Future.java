@@ -12,7 +12,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class Future<T> {
 	private T result;
-	
+	private LogManager logM = LogManager.getInstance();
+
+
 	/**
 	 * This should be the the only public constructor in this class.
 	 */
@@ -28,22 +30,25 @@ public class Future<T> {
      * @return return the result of type T if it is available, if not wait until it is available.
      * 	       
      */
-	public T get() {
-		//TODO: implement this.
-	//	if (result != null){
-	//		return result;
-	//	}
-	//	else
-	//		return get();
-		return null;
+	public T get() throws InterruptedException {
+		synchronized (this) {
+			while (!isDone()) {
+				wait();
+			}
+		}
+
+		return result;
 	}
 	
 	/**
      * Resolves the result of this Future object.
      */
 	public void resolve (T result) {
-		this.result=result;
-		// notify ?
+		synchronized (this) {
+			this.result = result;
+			logM.log.info("Future resolved with result: " + result.toString());
+			notifyAll(); // ?
+		}
 	}
 	
 	/**
@@ -65,7 +70,6 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		//TODO: implement this.
 		return null;
 	}
 

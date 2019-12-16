@@ -43,7 +43,7 @@ public class TimeService extends Publisher {
 						getSimplePublisher().sendBroadcast(toSend);
 						count++;
 					}
-					else { //??
+					else {
 						timer.cancel();
 					}
 				}

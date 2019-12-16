@@ -50,12 +50,13 @@ public class jsonHandler {
         }
             String[] arr = new String[toReturn.size()];
         for ( int i=0; i< toReturn.size();i++){
-            arr[i] = toReturn.get(i).toString();
+            String tmp = (toReturn.get(i).toString());
+            arr[i] =  (tmp).substring(1,tmp.length()-1);
         }
             return arr;
         }
 
-    
+
 
     public static void main(String[] args) throws FileNotFoundException {
         Object[] ar = parseInventory("inventory", "src/main/java/bgu/spl/mics/input201.json");

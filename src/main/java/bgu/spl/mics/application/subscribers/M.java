@@ -1,6 +1,9 @@
 package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
+import jdk.nashorn.internal.codegen.CompilerConstants;
+
+import java.util.HashMap;
 
 /**
  * M handles ReadyEvent - fills a report and sends agents to mission.
@@ -10,6 +13,9 @@ import bgu.spl.mics.*;
  */
 public class M extends Subscriber {
 	private LogManager logM = LogManager.getInstance();
+	private HashMap<Class, Callback> callbackmap;
+	private boolean terminated = false;
+
 
 	public M() {
 		super("M");
@@ -17,14 +23,17 @@ public class M extends Subscriber {
 	}
 
 	@Override
-	protected void initialize() {
+	protected void initialize()  {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
-		subscribeEvent(MissionReceivedEvent.class,c -> {
-			// need to implement the callback method
-		});
+		Callback back = new Callback() {
+			@Override
+			public void call(Object c) {
 
-		
+			}
+		};
+		subscribeEvent(MissionReceivedEvent.class, back);
+		// subscribe to broadcast
+
 	}
-
 }

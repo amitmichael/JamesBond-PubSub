@@ -15,7 +15,7 @@ public class FutureTest {
     }
 
     @Test
-    public void gettest(){
+    public void gettest() throws InterruptedException {
         String result = future.get();
         assertEquals(null,result);
     }
@@ -37,7 +37,7 @@ public class FutureTest {
     }
 
     @Test
-    public void resolvetest(){
+    public void resolvetest() throws InterruptedException {
         future.resolve("Done");
         String result = future.get();
         assertNotEquals(null,result);
@@ -45,7 +45,7 @@ public class FutureTest {
     }
 
     @Test
-    public void isDonetest2(){
+    public void isDonetest2() throws InterruptedException {
         resolvetest();
         future.resolve("Done");
         assertTrue(future.isDone());

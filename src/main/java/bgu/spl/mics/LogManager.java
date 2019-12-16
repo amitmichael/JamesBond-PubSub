@@ -1,4 +1,6 @@
 package bgu.spl.mics;
+import bgu.spl.mics.application.subscribers.Q;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -7,7 +9,8 @@ import java.util.logging.SimpleFormatter;
 
 public class LogManager {
     public Logger log;
-    private static LogManager logInstance = null;
+    private static class singletonHolder{
+        private static LogManager logInstance = new LogManager("SPL2Log.log");}
     FileHandler fh;
 
     private LogManager(String path){
@@ -37,8 +40,6 @@ public class LogManager {
 
 }
     public static LogManager getInstance() {
-        if (logInstance == null)
-            logInstance = new LogManager("SPL2Log.log");
-        return logInstance;
+        return singletonHolder.logInstance;
     }
 }
