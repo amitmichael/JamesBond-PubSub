@@ -28,28 +28,27 @@ public class Moneypenny extends Subscriber {
 	protected void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
-		this.subscribeEvent(AgentsAvailableEvent.class, c -> {
 			Callback back = new Callback() {
 				@Override
-				public void call(Object c) throws TimeoutException, InterruptedException {
-					if (c instanceof AgentsAvailableEvent) {
-						AgentsAvailableEvent event = (AgentsAvailableEvent) c;
-						Future fut = event.getFut();
-						try {
-							squad.sendAgents(event.getserials(), 100); //?? time
-							logM.log.info("squad is trying to execute agents");
-							fut.resolve("Agents executed");
-						} catch (TimeoutException e) {
-							fut.resolve("Agents didnt executed");
-							logM.log.info("sendAgents reached timeout");
-						}
-					}
-					else {
-						logM.log.warning("call is not of type AgentAvilableEvent");
+				public void call(Object c) {
+				if (c instanceof AgentsAvailableEvent) {
+					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
+					Future fut = event.getFut();
+					try {
+						logM.log.info("squad is trying to execute agents");
+						squad.sendAgents(event.getserials(), 100); //?? time
+						fut.resolve("Agents executed");
+					} catch (TimeoutException | InterruptedException e) {
+						fut.resolve("Agents didnt executed");
+						logM.log.warning("sendAgents reached timeout");
 					}
 				}
+				else {
+					logM.log.warning("call is not of type AgentAvilableEvent");
+				}
 			};
-		});
+		};
+			subscribeEvent(AgentsAvailableEvent.class,back);
 
 	}
 }

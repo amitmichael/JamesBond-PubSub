@@ -4,9 +4,8 @@ public class GadgetAvailableEvent implements Event<String> {
     private String gadget;
     private Future fut;
 
-public GadgetAvailableEvent(String gadget,Future fut){
+public GadgetAvailableEvent(String gadget){
     this.gadget = gadget;
-    this.fut = fut;
 }
 
 public String getGadget(){
