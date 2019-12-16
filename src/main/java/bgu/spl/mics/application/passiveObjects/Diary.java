@@ -1,12 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import bgu.spl.mics.jsonParser;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import bgu.spl.mics.LogManager;
+import bgu.spl.mics.jsonHandler;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +19,8 @@ public class Diary {
 	private static Diary diaryInstance = new Diary();}
 	private List<Report> reports;
 	int total;
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * constructor
@@ -62,7 +60,7 @@ public class Diary {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		jsonParser json = new jsonParser(filename);
+		jsonHandler json = new jsonHandler(filename);
 		json.printTofile(reports);
 	}
 

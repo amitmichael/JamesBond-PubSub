@@ -1,4 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
+import bgu.spl.mics.LogManager;
+
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -14,6 +16,8 @@ public class Squad {
 	private Map<String, Agent> agents; //key serial number, value agent
 	private static class singletonHolder{
 	private static Squad squadInstance = new Squad();}
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * Retrieves the single instance of this class.
@@ -54,8 +58,12 @@ public class Squad {
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time) throws InterruptedException { //@amit added that exception
-		if(getAgents(serials))
-			sleep(time);
+		 if (getAgents(serials)){
+			 sleep(time);
+			 releaseAgents(serials);
+		}
+		 else
+		 	logM.log.severe("getAgent is false - some agent is missing");
 	}
 
 	/**
@@ -63,15 +71,19 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials){
+	public boolean getAgents(List<String> serials) throws InterruptedException {
 		boolean done=true;
 		Iterator iter=serials.iterator();
 		while (iter.hasNext()&done){
 			Agent next=agents.get(iter.next());
-			if (!agents.get(next).isAvailable())
+			if (!this.agents.containsKey(next.getSerialNumber())){ // agent is not in the squad
 				done=false;
-			else next.acquire();
+				logM.log.severe("agent " + next.getSerialNumber() + " is not in the squad");
+			}
+			else
+				next.acquire();
 		}
+
 		return done;
 	}
 

@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.LogManager;
+
 /**
  * Passive data-object representing a information about an agent in MI6.
  * You must not alter any of the given public methods of this class. 
@@ -10,6 +12,8 @@ public class Agent {
 	private String name;
 	private String SerialNumber;
 	private boolean available;
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * constructor
@@ -67,7 +71,12 @@ public class Agent {
 	/**
 	 * Acquires an agent.
 	 */
-	public void acquire(){
+	public void acquire() throws InterruptedException {
+		while (available==false){
+			logM.log.info("Waiting for agent " + this.name + " to be available");
+			wait();
+		}
+		logM.log.info("agent " + this.name + " acquired");
 		available =false;
 	}
 
@@ -75,6 +84,9 @@ public class Agent {
 	 * Releases an agent.
 	 */
 	public void release(){
+		if (available==true)
+			logM.log.warning("release was called to available agent, agent:  " + name);
 		available =true;
+		notifyAll();
 	}
 }

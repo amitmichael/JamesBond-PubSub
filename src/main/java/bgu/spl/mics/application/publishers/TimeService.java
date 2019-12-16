@@ -25,7 +25,6 @@ public class TimeService extends Publisher {
 	private AtomicBoolean running = new AtomicBoolean(false);
 
 
-
 	/**
 	 *
 	 * @param duration the number of ticks before termination
@@ -38,18 +37,17 @@ public class TimeService extends Publisher {
 		task = new TimerTask() {
 			@Override
 			public synchronized void run() {
-				while (running.get()) {
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());
-						getSimplePublisher().sendBroadcast(toSend);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
+						getSimplePublisher().sendBroadcast(toSend);
 						count++;
 					}
 					else {
-						interrupt();
+						timer.cancel();
 					}
 				}
-			}
+
 		};
 	}
 
@@ -57,13 +55,9 @@ public class TimeService extends Publisher {
 	protected void initialize() { // ???
 		// TODO Implement this
 	}
-	public  void interrupt() {
-		running.set(false);
-	}
 
 	@Override
 	public void run() {
-		running.set(true);
 		timer.schedule(task, 0, 100);
 	}
 }

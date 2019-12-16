@@ -1,12 +1,9 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import bgu.spl.mics.jsonParser;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import bgu.spl.mics.LogManager;
+import bgu.spl.mics.jsonHandler;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +19,7 @@ public class Inventory {
 	private List<String> gadgets;
 	private static class singletonHolder{
 	private static Inventory inventoryInstance = new Inventory();}
+	private LogManager logM = LogManager.getInstance();
 
 	/**
 	 * constructor
@@ -29,6 +27,7 @@ public class Inventory {
 
 	private Inventory(){
 		gadgets = new LinkedList<String>();
+		logM.log.info("Inventory constructor was called");
 	}
 
 	/**
@@ -47,9 +46,13 @@ public class Inventory {
      * 						of the inventory.
      */
 	public void load (String[] inventory) {
+		logM.log.info("Inventory Load start, gadget size: " + this.gadgets.size());
+
 		for (int i=0;i < inventory.length; i++){
 			gadgets.add(inventory[i]);
 		}
+		logM.log.info("Inventory Load Finished, gadget size: " + this.gadgets.size());
+
 	}
 	
 	/**
@@ -59,8 +62,9 @@ public class Inventory {
      * @return 	‘false’ if the gadget is missing, and ‘true’ otherwise
      */
 	public boolean getItem(String gadget){
-		if (gadget != null)
-			return gadgets.contains(gadget);
+		if (gadget != null) {
+			return gadgets.remove(gadget);
+		}
 		else return false;
 	}
 
@@ -73,7 +77,7 @@ public class Inventory {
 	 */
 	public void printToFile(String filename){
 
-		jsonParser json = new jsonParser(filename);
+		jsonHandler json = new jsonHandler(filename);
 		json.printTofile(gadgets);
 
 	}
