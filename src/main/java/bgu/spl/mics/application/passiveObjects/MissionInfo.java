@@ -11,9 +11,6 @@ import java.util.List;
 public class MissionInfo {
 	private String missionName;
 	private String gadget;
-
-	private String missionName;
-	private String gadget=null;
 	private List<String> serialAgentsNumbers=null;
 	private int timeIssued;
 	private int timeExpired;

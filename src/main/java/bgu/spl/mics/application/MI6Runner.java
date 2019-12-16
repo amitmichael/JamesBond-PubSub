@@ -2,7 +2,9 @@ package bgu.spl.mics.application;
 
 import bgu.spl.mics.LogManager;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.application.passiveObjects.Squad;
 import bgu.spl.mics.application.publishers.TimeService;
+import bgu.spl.mics.jsonHandler;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import jdk.nashorn.internal.parser.JSONParser;
@@ -20,8 +22,15 @@ import java.util.logging.Logger;
 public class MI6Runner {
     public static void main(String[] args) {
         // TODO Implement this
-        TimeService tm = new TimeService(10);
-        tm.run();
+        Inventory inv = Inventory.getInstance();
+        if (args[0] == null) {
+            throw new NullPointerException("Enter input json path in program arguments");
+        } else {
+            String[] arr = jsonHandler.parseSection("inventory", args[0]); //"src/main/java/bgu/spl/mics/input201.json"
+            inv.load(arr);
+            TimeService tm = new TimeService(10);
+            tm.run();
 
+        }
     }
 }
