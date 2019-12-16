@@ -1,23 +1,15 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.*;
+import bgu.spl.mics.AgentsAvailableEvent;
+import bgu.spl.mics.Future;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.Squad;
-import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
-import bgu.spl.mics.application.subscribers.Q;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import jdk.nashorn.internal.parser.JSONParser;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.lang.reflect.Type;
+import bgu.spl.mics.jsonHandler;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static java.lang.Thread.sleep;
 
