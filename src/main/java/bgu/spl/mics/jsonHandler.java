@@ -35,7 +35,7 @@ public class jsonHandler {
 
         }
     }
-    public static String[] parseSection(String section,String path)  {
+    public static String[] parseInventory(String section,String path)  {
         ArrayList toReturn = new ArrayList();
         try {
             JsonParser jsonParser = new JsonParser();
@@ -55,8 +55,10 @@ public class jsonHandler {
             return arr;
         }
 
+    
+
     public static void main(String[] args) throws FileNotFoundException {
-        Object[] ar = parseSection("inventory", "src/main/java/bgu/spl/mics/input201.json");
+        Object[] ar = parseInventory("inventory", "src/main/java/bgu/spl/mics/input201.json");
         for (Object obj : ar){
             System.out.println(obj);
         }

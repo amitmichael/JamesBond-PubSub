@@ -18,7 +18,7 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	private static MessageBroker MessageBrokerInstance = null;
 	private ConcurrentHashMap<Class, LinkedList> topics; // will hold all topics in the broker
-	private ConcurrentHashMap<Subscriber, Queue<Message>> registered;
+	private ConcurrentHashMap<Subscriber, Queue<Message>> registered; //will hold all registered subscribers and their queues
 	private LogManager logM = LogManager.getInstance();
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");

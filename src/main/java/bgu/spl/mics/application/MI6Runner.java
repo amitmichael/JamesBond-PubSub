@@ -26,7 +26,7 @@ public class MI6Runner {
         if (args.length ==0) {
             throw new NullPointerException("Enter input json path in program arguments");
         } else {
-            String[] arr = jsonHandler.parseSection("inventory", args[0]); //"src/main/java/bgu/spl/mics/input201.json"
+            String[] arr = jsonHandler.parseInventory("inventory", args[0]); //"src/main/java/bgu/spl/mics/input201.json"
             inv.load(arr);
             TimeService tm = new TimeService(5);
             tm.run();
