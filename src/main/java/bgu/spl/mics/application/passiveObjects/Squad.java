@@ -1,4 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
+import bgu.spl.mics.LogManager;
+
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -14,6 +16,8 @@ public class Squad {
 	private Map<String, Agent> agents; //key serial number, value agent
 	private static class singletonHolder{
 	private static Squad squadInstance = new Squad();}
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * Retrieves the single instance of this class.

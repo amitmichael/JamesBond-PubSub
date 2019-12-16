@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.LogManager;
 import bgu.spl.mics.jsonHandler;
 
 import java.util.LinkedList;
@@ -18,6 +19,8 @@ public class Diary {
 	private static Diary diaryInstance = new Diary();}
 	private List<Report> reports;
 	int total;
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * constructor

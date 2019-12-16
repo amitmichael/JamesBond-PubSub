@@ -19,16 +19,18 @@ public class jsonHandler {
 
     public void printTofile(List<?> toPrint ) {
         if (!fileName.contains(".json"))
-            System.out.println("file name is not from type json");
+            logM.log.severe("file name is not from type json");
 
         else {
             File file = new File(fileName);
             if (file.exists()) // if file with the same name already exists print error
-                System.out.println("file name " + fileName + " already exists");
+                logM.log.warning("file name " + fileName + " already exists");
             Gson gson = new GsonBuilder().create();
             try (FileWriter fw = new FileWriter(fileName)) { //write the gadgets to json file
+                logM.log.info("File " + fileName + " Created");
                 gson.toJson(toPrint, fw);
             } catch (IOException e) {
+                logM.log.severe("printTofile end with exception");
             }
 
         }

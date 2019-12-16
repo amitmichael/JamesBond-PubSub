@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.LogManager;
+
 /**
  * Passive data-object representing a information about an agent in MI6.
  * You must not alter any of the given public methods of this class. 
@@ -10,6 +12,8 @@ public class Agent {
 	private String name;
 	private String SerialNumber;
 	private boolean available;
+	private LogManager logM = LogManager.getInstance();
+
 
 	/**
 	 * constructor

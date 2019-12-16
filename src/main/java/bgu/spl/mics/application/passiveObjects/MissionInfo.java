@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.LogManager;
+
 import java.util.List;
 
 /**
@@ -15,8 +17,10 @@ public class MissionInfo {
 	private int timeIssued;
 	private int timeExpired;
 	private int duration;
+	private LogManager logM = LogManager.getInstance();
 
-    /**
+
+	/**
      * Sets the name of the mission.
      */
     public void setMissionName(String missionName) {
