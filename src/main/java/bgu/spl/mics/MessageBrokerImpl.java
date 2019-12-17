@@ -17,13 +17,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageBrokerImpl implements MessageBroker {
 
 	private static MessageBroker MessageBrokerInstance = null;
-	private ConcurrentHashMap<Class, LinkedList> topics; // will hold all topics in the broker
+	private ConcurrentHashMap<Class, Queue<Subscriber>> topics; // will hold all topics in the broker
 	private ConcurrentHashMap<Subscriber, Queue<Message>> registered; //will hold all registered subscribers and their queues
 	private LogManager logM = LogManager.getInstance();
 
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");
-		topics = new ConcurrentHashMap<Class, LinkedList>();
+		topics = new ConcurrentHashMap<Class, Queue<Subscriber>>();
 		registered = new ConcurrentHashMap<Subscriber, Queue<Message>>();
 	}
 
@@ -38,11 +38,12 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
+	public synchronized   <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
 		if (!topics.containsKey(type)) { // if topic does not exists
 			topics.put(type, new LinkedList<Subscriber>());
 		}
 		topics.get(type).add(m); // add the subscriber to topic list
+		logM.log.info("Subscriber " + m.getName() + " Subscribed to " + type);
 
 	}
 
@@ -61,7 +62,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public void sendBroadcast(Broadcast b) {
+	public synchronized void sendBroadcast(Broadcast b) {
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
 		if (!topics.containsKey(b.getClass())) {
@@ -69,7 +70,7 @@ public class MessageBrokerImpl implements MessageBroker {
 			logM.log.info("topic " + b.getClass() + " added");
 		}
 		if (topics.containsKey(b.getClass())) {
-			LinkedList<Subscriber> distributionList = topics.get(b.getClass());
+			Queue<Subscriber> distributionList = topics.get(b.getClass());
 			if (!distributionList.isEmpty()) {
 				Iterator it = distributionList.iterator();
 
@@ -90,17 +91,17 @@ public class MessageBrokerImpl implements MessageBroker {
 
 
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {
+	public synchronized  <T> Future<T> sendEvent(Event<T> e) {
 		logM.log.info("SendEvent started msg from type " + e.getClass());
 		Future fut = new Future();
 		if (!topics.containsKey(e.getClass())){
-			topics.put(e.getClass(), new LinkedList<Subscriber>());
+			topics.put(e.getClass(), new ConcurrentLinkedQueue<>());
 		}
 		if (!topics.get(e.getClass()).isEmpty()) {
-			Object curr = topics.get(e.getClass()).getFirst();
+			Subscriber curr = topics.get(e.getClass()).poll();
 			e.setFuture(fut);
 			registered.get(curr).add(e); //add the msg to curr queue
-			topics.get(e.getClass()).add(curr); //add curr to the topic list
+			topics.get(e.getClass()).add(curr); //add curr to the topic queue
 			synchronized (curr){
 				curr.notify();
 			}

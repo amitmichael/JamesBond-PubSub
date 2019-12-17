@@ -89,8 +89,11 @@ public class Agent {
 		synchronized (this) {
 			if (available == true)
 				logM.log.warning("release was called to available agent, agent:  " + name);
+			else {
 			available = true;
-			notifyAll();
+				logM.log.info("Agent " + name + " released");
+				notifyAll();
 		}
 	}
+}
 }

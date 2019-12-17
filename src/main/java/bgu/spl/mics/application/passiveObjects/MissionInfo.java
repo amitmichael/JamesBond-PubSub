@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.LogManager;
+import bgu.spl.mics.json.Mission;
 
 import java.util.List;
 
@@ -20,12 +21,21 @@ public class MissionInfo {
 	private LogManager logM = LogManager.getInstance();
 
 
+	public MissionInfo(Mission m){
+		missionName = m.getMissionName();
+		gadget = m.getGadget();
+		serialAgentsNumbers = m.getSerialAgentsNumbers();
+		timeIssued = m.getTimeIssued();
+		timeExpired = m.getTimeExpired();
+		duration = m.getDuration();
+		logM.log.info("MissionInfo " + missionName + " Created");
+	}
+
 	/**
      * Sets the name of the mission.
      */
     public void setMissionName(String missionName) {
 		this.missionName= missionName;
-
     }
 
 	/**

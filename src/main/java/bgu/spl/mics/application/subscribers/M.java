@@ -17,8 +17,8 @@ public class M extends Subscriber {
 	private boolean terminated = false;
 
 
-	public M() {
-		super("M");
+	public M(String name) {
+		super(name);
 		// TODO Implement this
 	}
 
