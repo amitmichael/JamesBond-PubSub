@@ -1,5 +1,6 @@
 package bgu.spl.mics.example.subscribers;
 
+import bgu.spl.mics.MessageBrokerImpl;
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.example.messages.ExampleBroadcast;
 
@@ -28,7 +29,7 @@ public class ExampleBroadcastSubscriber extends Subscriber {
     @Override
     protected void initialize() {
         System.out.println("Listener " + getName() + " started");
-        
+        MessageBrokerImpl.getInstance().register(this);
         subscribeBroadcast(ExampleBroadcast.class, message -> {
             mbt--;
             System.out.println("Listener " + getName() + " got a new message from " + message.getSenderId() + "! (mbt: " + mbt + ")");

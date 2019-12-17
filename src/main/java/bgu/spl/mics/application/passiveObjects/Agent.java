@@ -71,14 +71,19 @@ public class Agent {
 	/**
 	 * Acquires an agent.
 	 */
-	public void acquire() throws InterruptedException {
+	public void acquire()  {
 		synchronized (this) {
-			while (available == false) {
-				logM.log.info("Waiting for agent " + this.name + " to be available");
-				wait();
+			try {
+				while (available == false) {
+					logM.log.info("Waiting for agent " + this.name + " to be available");
+					wait();
+				}
+
 			}
+			catch(InterruptedException e){
+				logM.log.severe("agent " + this.name + " interrupt");
 
-
+			}
 			logM.log.info("agent " + this.name + " acquired");
 			available = false;
 		}

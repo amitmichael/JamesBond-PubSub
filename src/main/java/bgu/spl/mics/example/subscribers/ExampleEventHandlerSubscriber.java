@@ -1,5 +1,6 @@
 package bgu.spl.mics.example.subscribers;
 
+import bgu.spl.mics.MessageBrokerImpl;
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.example.messages.ExampleEvent;
 
@@ -28,7 +29,7 @@ public class ExampleEventHandlerSubscriber extends Subscriber {
     @Override
     protected void initialize() {
         System.out.println("Event Handler " + getName() + " started");
-        
+        MessageBrokerImpl.getInstance().register(this);
         subscribeEvent(ExampleEvent.class, ev -> {
             mbt--;
             System.out.println("Event Handler " + getName() + " got a new event from " + ev.getSenderName() + "! (mbt: " + mbt + ")");

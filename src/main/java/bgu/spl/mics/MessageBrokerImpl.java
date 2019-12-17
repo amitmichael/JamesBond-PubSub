@@ -158,12 +158,12 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
 			synchronized (m) {
-				while (registered.get(m).isEmpty()) {
-					logM.log.info(m.getName() + " waiting for msg");
-					m.wait();
+					while (registered.get(m).isEmpty()) {
+						logM.log.info(m.getName() + " waiting for msg");
+						m.wait();
+					}
+					return registered.get(m).poll();
 				}
-				return registered.get(m).poll();
-			}
 	}
 
 }

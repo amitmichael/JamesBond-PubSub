@@ -1,7 +1,6 @@
 package bgu.spl.mics.example.messages;
 
 import bgu.spl.mics.Broadcast;
-import bgu.spl.mics.Future;
 
 public class ExampleBroadcast implements Broadcast {
 
@@ -14,6 +13,5 @@ public class ExampleBroadcast implements Broadcast {
     public String getSenderId() {
         return senderId;
     }
-
 
 }

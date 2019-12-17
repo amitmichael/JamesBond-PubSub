@@ -39,7 +39,7 @@ public class ExampleManager {
                                     throw new IllegalArgumentException("unknown app type, supported types: " + creators.keySet());
                                 }
 
-                                new Thread(creator.create(params[2], Arrays.copyOfRange(params, 2, params.length))).start();
+                                new Thread(creator.create(params[2], Arrays.copyOfRange(params, 3, params.length))).start();
                             } catch (IllegalArgumentException ex) {
                                 System.out.println("Error: " + ex.getMessage());
                             }
