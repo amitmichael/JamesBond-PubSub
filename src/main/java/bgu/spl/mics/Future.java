@@ -1,5 +1,7 @@
 package bgu.spl.mics;
 
+import java.sql.Time;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,10 +53,10 @@ public class Future<T> {
 	public void resolve (T result) {
 		synchronized (this) {
 			this.result = result;
-			if (result.equals("True"))
+			if (result.equals("true"))
 				success=true;
 			logM.log.info("Future resolved with result: " + result.toString() + " ,Success: " + success);
-			notifyAll(); // ?
+			notifyAll();
 		}
 	}
 	
@@ -77,7 +79,26 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		return null;
+		synchronized (this) {
+			long timeoutinMil = unit.toMillis(timeout);
+			if (isDone())
+				return result;
+			else {
+				try {
+					wait(timeoutinMil);
+				} catch (InterruptedException e) {
+					logM.log.severe("InterruptedException");
+				}
+				if (isDone()) {
+					return result;
+				} else {
+					logM.log.warning("Future get reached timeout ");
+					result = (T) "Timeout";
+				}
+			}
+		}
+		return result;
 	}
+
 
 }

@@ -1,7 +1,6 @@
 package bgu.spl.mics.example.messages;
 
 import bgu.spl.mics.Event;
-import bgu.spl.mics.Future;
 
 public class ExampleEvent implements Event<String>{
 
@@ -14,6 +13,4 @@ public class ExampleEvent implements Event<String>{
     public String getSenderName() {
         return senderName;
     }
-
-
 }

@@ -1,0 +1,58 @@
+{
+    "inventory": [ 
+        "Sky Hook",
+        "Geiger counter",
+        "X-ray glasses",
+        "Dagger shoe"
+    ],
+    "services": {
+        "M": 2,
+        "Moneypenny": 2,
+        "intelligence": [
+            {
+                "missions": [
+                    {
+                        "serialAgentsNumbers": [
+                            "006",
+                            "007"
+                        ],
+                        "duration": 7,
+                        "gadget": "Sky Hook",
+                        "missionName": "Thunderball",
+                        "timeExpired": 15,
+                        "timeIssued": 3
+                    }
+                ]
+            },
+            {
+                "missions": [
+                    {
+                        "serialAgentsNumbers": [
+                            "006"
+                        ],
+                        "duration": 7,
+                        "gadget": "Sky Hook",
+                        "missionName": "Liam Nisan Alive",
+                        "timeExpired": 28,
+                        "timeIssued": 3
+                    }
+                ]
+            }
+        ],
+        "time": 30
+    },
+    "squad": [
+        {
+            "name": "James Bond",
+            "serialNumber": "007"
+        },
+        {
+            "name": "Amy Santiago",
+            "serialNumber": "006"
+        },
+ 	{
+            "name": "Jake Parelta",
+            "serialNumber": "003"
+        }
+    ]
+}

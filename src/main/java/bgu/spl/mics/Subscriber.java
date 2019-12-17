@@ -94,15 +94,16 @@ public abstract class Subscriber extends RunnableSubPub {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-        //TODO: implement this.
+        MessageBrokerImpl.getInstance().complete(e,result);
     }
 
     /**
      * Signals the event loop that it must terminate after handling the current
      * message.
      */
-    protected final void terminate() {
+    protected synchronized final void terminate() {
         this.terminated = true;
+        MessageBrokerImpl.getInstance().unregister(this);
     }
 
     /**

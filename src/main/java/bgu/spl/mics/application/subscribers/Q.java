@@ -2,6 +2,7 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import sun.font.TrueTypeFont;
 
 /**
  * Q is the only Subscriber\Publisher that has access to the {@link bgu.spl.mics.application.passiveObjects.Inventory}.
@@ -46,7 +47,7 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						MessageBrokerImpl.getInstance().complete(event,"True");
+						MessageBrokerImpl.getInstance().complete(event,"true");
 					} else {
 						MessageBrokerImpl.getInstance().complete(event,"Gadget " + gad+  " is not available");
 					}
@@ -60,5 +61,7 @@ public class Q extends Subscriber {
 
 
 	}
+
+
 
 }

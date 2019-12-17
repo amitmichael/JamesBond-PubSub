@@ -37,8 +37,9 @@ public class Moneypenny extends Subscriber {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
 
 						logM.log.info("squad is trying to execute agents");
-						Boolean result = squad.getAgents(event.getserials());
-						MessageBrokerImpl.getInstance().complete(event, result.toString());
+							Boolean result = squad.getAgents(event.getserials());
+							MessageBrokerImpl.getInstance().complete(event, result.toString());
+
 					/*} catch ( InterruptedException e) {
 						MessageBrokerImpl.getInstance().complete(event,"Agents didnt executed");
 						logM.log.warning("sendAgents reached timeout");
