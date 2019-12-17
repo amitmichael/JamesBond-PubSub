@@ -14,5 +14,7 @@ public class MissionReceivedEvent implements Event<String> {
         this.info = mission;
     }
 
-
+    public MissionInfo getInfo() {
+        return info;
+    }
 }
