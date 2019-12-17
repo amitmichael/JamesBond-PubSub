@@ -1,13 +1,9 @@
 package bgu.spl.mics;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The {@link MessageBrokerImpl class is the implementation of the MessageBroker interface.
@@ -17,14 +13,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageBrokerImpl implements MessageBroker {
 
 	private static MessageBroker MessageBrokerInstance = null;
-	private ConcurrentHashMap<Class, Queue<Subscriber>> topics; // will hold all topics in the broker
-	private ConcurrentHashMap<Subscriber, Queue<Message>> registered; //will hold all registered subscribers and their queues
+	private HashMap<Class, Queue<Subscriber>> topics; // will hold all topics in the broker
+	private HashMap<Subscriber, Queue<Message>> registered; //will hold all registered subscribers and their queues
 	private LogManager logM = LogManager.getInstance();
 
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");
-		topics = new ConcurrentHashMap<Class, Queue<Subscriber>>();
-		registered = new ConcurrentHashMap<Subscriber, Queue<Message>>();
+		topics = new HashMap<Class, Queue<Subscriber>>();
+		registered = new HashMap<Subscriber, Queue<Message>>();
 	}
 
 	/**
@@ -95,7 +91,8 @@ public class MessageBrokerImpl implements MessageBroker {
 		logM.log.info("SendEvent started msg from type " + e.getClass());
 		Future fut = new Future();
 		if (!topics.containsKey(e.getClass())){
-			topics.put(e.getClass(), new ConcurrentLinkedQueue<>());
+			topics.put(e.getClass(), new LinkedList<Subscriber>() {
+			});
 		}
 		if (!topics.get(e.getClass()).isEmpty()) {
 			Subscriber curr = topics.get(e.getClass()).poll();
@@ -113,7 +110,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void register(Subscriber m) {
 		if (registered.containsKey(m))
 			logM.log.warning("Attempt to register exists subscriber: " + m.getName());
-		registered.put(m, new ConcurrentLinkedQueue());
+		registered.put(m, new LinkedList<>());
 		logM.log.info("Subscriber " + m.getName() + " registered");
 
 	}

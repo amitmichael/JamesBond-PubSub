@@ -22,8 +22,6 @@ public class Intelligence extends Subscriber {
 		super(name);
 		missions = m;
 		logM.log.info(name + " created with " + m.size() + " missions");
-
-		// TODO Implement this
 	}
 
 	@Override

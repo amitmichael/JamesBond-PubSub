@@ -22,11 +22,13 @@ public class MI6Runner {
         if (args.length ==0) {
             logM.log.severe("Enter input json path in program arguments");
         } else {
+            //parse the json
             JsonParser js = new JsonParser(args[0]);
             List<List<Subscriber>> services =  js.parseJson();
             if (services.size() < 3 )
                 logM.log.severe("json did not parse all 2 type of services");
             else {
+            // run the executors
                 //M
                 ExecutorService executorM = Executors.newFixedThreadPool(services.get(0).size());
                 Iterator itm = services.get(0).iterator(); //iterator on M services
