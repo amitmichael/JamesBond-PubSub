@@ -1,6 +1,14 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.JsonParser;
+import bgu.spl.mics.LogManager;
+import bgu.spl.mics.Subscriber;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.lang.Thread.sleep;
 
@@ -10,12 +18,45 @@ import static java.lang.Thread.sleep;
  */
 public class MI6Runner {
     public static void main(String[] args) throws InterruptedException {
-        // TODO Implement this
+        LogManager logM = LogManager.getInstance();
         if (args.length ==0) {
-            throw new NullPointerException("Enter input json path in program arguments");
+            logM.log.severe("Enter input json path in program arguments");
         } else {
             JsonParser js = new JsonParser(args[0]);
-            js.parseJson();
+            List<List<Subscriber>> services =  js.parseJson();
+            if (services.size() < 3 )
+                logM.log.severe("json did not parse all 2 type of services");
+            else {
+                //M
+                ExecutorService executorM = Executors.newFixedThreadPool(services.get(0).size());
+                Iterator itm = services.get(0).iterator(); //iterator on M services
+                logM.log.info("Executing " + services.get(0).size() + " M services");
+                while (itm.hasNext()) {
+                    executorM.execute((Subscriber) itm.next());
+                }
+                executorM.shutdown();
+
+                //MP
+                ExecutorService executorMP = Executors.newFixedThreadPool(services.get(1).size());
+                Iterator itmp = services.get(1).iterator(); //iterator on MoneyPenny services
+                logM.log.info("Executing " + services.get(1).size() + " MoneyPenny services");
+                while (itmp.hasNext()) {
+                    executorMP.execute((Subscriber) itmp.next());
+                }
+                executorMP.shutdown();
+
+
+                //Int
+                ExecutorService executorInt = Executors.newFixedThreadPool(services.get(2).size());
+                Iterator itint = services.get(2).iterator(); //iterator on Intelligence services
+                logM.log.info("Executing " + services.get(2).size() + " Intelligence services");
+
+                while (itint.hasNext()) {
+                    executorInt.execute((Subscriber) itint.next());
+                }
+                executorInt.shutdown();
+            }
+
 
             /*
             Moneypenny mp1 = new Moneypenny("1");
