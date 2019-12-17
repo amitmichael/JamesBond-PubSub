@@ -1,13 +1,10 @@
 package bgu.spl.mics.application.subscribers;
-
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Diary;
+import bgu.spl.mics.application.passiveObjects.MissionInfo;
 import bgu.spl.mics.application.passiveObjects.Report;
-import jdk.nashorn.internal.codegen.CompilerConstants;
-
-import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static bgu.spl.mics.MessageBrokerImpl.getInstance;
 
@@ -19,13 +16,15 @@ import static bgu.spl.mics.MessageBrokerImpl.getInstance;
  */
 public class M extends Subscriber {
 	private LogManager logM = LogManager.getInstance();
-	long timeTick;
+	private int timeTick;
+	private int serialNumber;
 	private Diary diary = Diary.getInstance();
 	private Report report;
 
 
-	public M(String name) {
+	public M(String name,int serialNumber) {
 		super(name);
+		this.serialNumber = serialNumber;
 		timeTick = 0;
 	}
 
@@ -44,6 +43,7 @@ public class M extends Subscriber {
 			public void call(Object c) throws InterruptedException {
 				if (c instanceof MissionReceivedEvent) {
 					MissionReceivedEvent event = (MissionReceivedEvent) c;
+					Diary.getInstance().increment(); //increment the total
 					long timeExpired = event.getInfo().getTimeExpired();
 					logM.log.info("new TimeExpired assigned");
 					GadgetAvailableEvent eventG = new GadgetAvailableEvent(event.getInfo().getGadget());
@@ -55,10 +55,11 @@ public class M extends Subscriber {
 					String result1 = (String) fut1.get((timeExpired-timeTick)*100, TimeUnit.MILLISECONDS);
 					String result2 = (String) fut2.get((timeExpired-timeTick)*100, TimeUnit.MILLISECONDS);
 					try {
-						if (result1.equals("true") & result2.equals("true")) {
+						if (!result1.equals("false") & result2.equals("true")) {
 							if (timeTick <= timeExpired) {
-								//MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission());
+								Future fut3 = MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission(event.getInfo().getSerialAgentsNumbers(),event.getInfo().getDuration()));
 								logM.log.info("Subscriber " + getName() + " sending ExcuteMission");
+								addReport(event.getInfo(),fut3,fut1);
 							} else {
 								//MessageBrokerImpl.getInstance().sendEvent(new AbortMission());
 								logM.log.warning("Subscriber " + getName() + " sending AbortMission due to time expired");
@@ -97,6 +98,21 @@ public class M extends Subscriber {
 			}
 		};
 		subscribeBroadcast(TickBroadcast.class, tickCallBack);
+
+
+	}
+	public int getSerialNumber(){
+		return serialNumber;
+	}
+	private void addReport(MissionInfo m,Future t3,Future f1) throws InterruptedException {
+		List<String> serials = m.getSerialAgentsNumbers();
+		Future names = getSimplePublisher().sendEvent(new GetAgentNamesEvent(serials));
+		int Qtime = Integer.parseInt((String) f1.get());
+		int MPinstance = Integer.parseInt((String) t3.get());
+		List<String> namesList = (List<String>) names.get();
+		Report report = new Report(m.getMissionName(),serialNumber,MPinstance,serials,namesList,m.getGadget(),m.getTimeIssued(),Qtime,timeTick);
+		logM.log.info("New report was created");
+		Diary.getInstance().addReport(report);
 	}
 }
 

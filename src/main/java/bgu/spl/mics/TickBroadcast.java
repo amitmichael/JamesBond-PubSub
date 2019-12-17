@@ -2,14 +2,14 @@ package bgu.spl.mics;
 
 
 public class TickBroadcast implements Broadcast {
-    private long time;
+    private int time;
 
-    public TickBroadcast(long time){
+    public TickBroadcast(int time){
         super();
         this.time=time;
     }
 
-    public long getTime(){
+    public int getTime(){
         return time;
     }
 

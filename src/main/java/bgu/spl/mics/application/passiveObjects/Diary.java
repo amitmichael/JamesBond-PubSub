@@ -2,9 +2,12 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.JsonParser;
 import bgu.spl.mics.LogManager;
+import com.sun.org.apache.xalan.internal.res.XSLTErrorResources;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Passive object representing the diary where all reports are stored.
@@ -47,9 +50,11 @@ public class Diary {
 	 * adds a report to the diary
 	 * @param reportToAdd - the report to add
 	 */
-	public void addReport(Report reportToAdd){
+	public void addReport(Report reportToAdd) throws InterruptedException {
 		reports.add(reportToAdd);
-		total++;
+		logM.log.info("Report was added to diary");
+		sleep(50);
+		printToFile("diaryTest.json"); // TBD to delete
 	}
 
 	/**
@@ -70,5 +75,9 @@ public class Diary {
 	 */
 	public int getTotal(){
 		return total;
+	}
+
+	public void increment(){
+		total++;
 	}
 }
