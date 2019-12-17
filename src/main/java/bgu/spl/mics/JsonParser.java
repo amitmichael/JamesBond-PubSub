@@ -2,6 +2,7 @@ package bgu.spl.mics;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
+import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.json.Intelligence;
@@ -10,14 +11,11 @@ import bgu.spl.mics.json.Mission;
 import bgu.spl.mics.json.Squad;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
-import jdk.nashorn.internal.parser.JSONParser;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,9 +27,10 @@ public class JsonParser {
 
 
 
-    public JsonParser(String fileName){
+    public  JsonParser(String fileName){
         this.fileName = fileName;
     }
+
 
     public void printTofile(List<?> toPrint ) {
         if (!fileName.contains(".json"))
@@ -51,13 +50,17 @@ public class JsonParser {
 
         }
     }
-    public void  parseJson() {
+    public List<List<?>>  parseJson() {
+
+        LinkedList<List<?>> toReturn = new LinkedList();
+
 
         try {
             logM.log.info("Starting parsing json");
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(this.fileName));
             JsonEvent event = gson.fromJson(reader, JsonEvent.class);
+
             //Inventory
             Inventory.getInstance().load(event.getInventory());
 
@@ -74,32 +77,28 @@ public class JsonParser {
 
             //Services
             //M
+            LinkedList<Subscriber> listM = new LinkedList<>();
             int numofServicesM = event.getServices().getM();
-            ExecutorService executorM = Executors.newFixedThreadPool(numofServicesM);
             logM.log.info("Creating " + numofServicesM + " M Services");
-            for (int j=0; j< event.getServices().getM(); j++){
-                M tmp = new M("M" + j);
-                // need to run threads
-                executorM.execute(tmp);
+            for (int j=0; j< numofServicesM; j++){
+                listM.add(new M("M"+ (j+1)));
             }
+            toReturn.add(listM);
 
             //MoneyPenny
+            LinkedList<Subscriber> listMP = new LinkedList<>();
             int numofServicesMP = event.getServices().getMoneypenny();
-            ExecutorService executorMP = Executors.newFixedThreadPool(numofServicesMP);
             logM.log.info("Creating " + numofServicesMP + " Moneypenny Services");
-            for (int j=0; j< event.getServices().getMoneypenny(); j++){
-                Moneypenny tmp1 = new  Moneypenny(""+j);
-                // need to run threads
-                executorMP.execute(tmp1);
-
+            for (int j=0; j< numofServicesMP; j++){
+                listMP.add(new  Moneypenny(""+(j+1)));
             }
+            toReturn.add(listMP);
 
-            sleep(100); // wait for M and MP to finish initialization
 
             //Intelligence
+            LinkedList<Subscriber> listint = new LinkedList<>();
             List<Intelligence> in = event.getServices().getIntelligence();
             int numofServicesInt = in.size();
-            ExecutorService executorInt = Executors.newFixedThreadPool(numofServicesInt);
             logM.log.info("Creating " + numofServicesInt + " Intelligence Services");
             Iterator it1 = in.iterator();
             int k=0;
@@ -111,23 +110,27 @@ public class JsonParser {
                 while (itcopy.hasNext()){
                     m1.add(new MissionInfo((Mission) itcopy.next()));
                 }
-                bgu.spl.mics.application.publishers.Intelligence tmp2 = new bgu.spl.mics.application.publishers.Intelligence("Intelligence" + k,m1);
-                executorInt.execute(tmp2);
+                listint.add(new bgu.spl.mics.application.subscribers.Intelligence("Intelligence" + (k+1),m1));
                 k++;
-                // need to run threads
             }
+            toReturn.add(listint);
+
+            //TimeService
+            logM.log.info("Creating " + 1 + " TimeService Services");
+            LinkedList<Publisher> listTime = new LinkedList<>();
+            listTime.add(new TimeService(event.getServices().getTime()));
+            toReturn.add(listTime);
+
             logM.log.info("Json parse finished successfully ");
 
 
-        } catch (FileNotFoundException | InterruptedException e) {
+        } catch (FileNotFoundException e) {
             logM.log.severe("File" + this.fileName + " not found");
         }
 
-
+            return toReturn;
     }
 
 
-    public static void main(String[] args) throws FileNotFoundException {
 
-    }
 }

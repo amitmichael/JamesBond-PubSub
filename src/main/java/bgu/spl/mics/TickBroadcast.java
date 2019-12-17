@@ -13,8 +13,5 @@ public class TickBroadcast implements Broadcast {
         return time;
     }
 
-    @Override
-    public void setFuture(Future fut) {
 
-    }
 }

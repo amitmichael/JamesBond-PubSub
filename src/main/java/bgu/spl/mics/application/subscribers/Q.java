@@ -32,6 +32,11 @@ public class Q extends Subscriber {
 	protected void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
+		subscribeToGadgetAvailableEvent();
+
+	}
+
+	private void subscribeToGadgetAvailableEvent (){
 		Callback back = new Callback() {
 			@Override
 			public void call(Object c) {
@@ -41,9 +46,9 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						event.getFut().resolve("Done");
+						MessageBrokerImpl.getInstance().complete(event,"True");
 					} else {
-						event.getFut().resolve("Gadget " + gad+  " is not available");
+						MessageBrokerImpl.getInstance().complete(event,"Gadget " + gad+  " is not available");
 					}
 				}
 				else {
@@ -52,6 +57,7 @@ public class Q extends Subscriber {
 			}
 		};
 		subscribeEvent(GadgetAvailableEvent.class, back);
+
 
 	}
 

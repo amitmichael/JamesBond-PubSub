@@ -48,7 +48,7 @@ public class Future<T> {
 	public void resolve (T result) {
 		synchronized (this) {
 			this.result = result;
-			if (result.equals("Done"))
+			if (result.equals("True"))
 				success=true;
 			logM.log.info("Future resolved with result: " + result.toString() + " ,Success: " + success);
 			notifyAll(); // ?

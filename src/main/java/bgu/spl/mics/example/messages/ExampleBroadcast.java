@@ -15,8 +15,5 @@ public class ExampleBroadcast implements Broadcast {
         return senderId;
     }
 
-    @Override
-    public void setFuture(Future fut) {
 
-    }
 }

@@ -13,7 +13,6 @@ import java.util.HashMap;
  */
 public class M extends Subscriber {
 	private LogManager logM = LogManager.getInstance();
-	private HashMap<Class, Callback> callbackmap;
 	private boolean terminated = false;
 
 
@@ -23,7 +22,7 @@ public class M extends Subscriber {
 	}
 
 	@Override
-	protected void initialize()  {
+	protected synchronized void initialize()  {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
 		Callback back = new Callback() {

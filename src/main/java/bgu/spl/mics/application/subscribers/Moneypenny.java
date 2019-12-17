@@ -2,8 +2,6 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Squad;
-
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -25,31 +23,35 @@ public class Moneypenny extends Subscriber {
 	}
 
 	@Override
-	protected void initialize() {
+	protected synchronized void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
-			Callback back = new Callback() {
-				@Override
-				public void call(Object c) {
+		subscribeToAgentsAvailableEvent();
+	}
+
+	private void subscribeToAgentsAvailableEvent(){
+		Callback back = new Callback() {
+			@Override
+			public void call(Object c) throws InterruptedException {
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
-					Future fut = event.getFut();
-					try {
+
 						logM.log.info("squad is trying to execute agents");
-						squad.sendAgents(event.getserials(), 100); //?? time
-						fut.resolve("Agents executed");
-					} catch (TimeoutException | InterruptedException e) {
-						fut.resolve("Agents didnt executed");
+						Boolean result = squad.getAgents(event.getserials());
+						MessageBrokerImpl.getInstance().complete(event, result.toString());
+					/*} catch ( InterruptedException e) {
+						MessageBrokerImpl.getInstance().complete(event,"Agents didnt executed");
 						logM.log.warning("sendAgents reached timeout");
+					}*/
 					}
-				}
 				else {
 					logM.log.warning("call is not of type AgentAvilableEvent");
 				}
-			};
+			}
 		};
-			subscribeEvent(AgentsAvailableEvent.class,back);
+		subscribeEvent(AgentsAvailableEvent.class,back);
 
 	}
 }
+
 
