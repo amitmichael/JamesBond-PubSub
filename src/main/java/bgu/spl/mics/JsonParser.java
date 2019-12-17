@@ -2,6 +2,7 @@ package bgu.spl.mics;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
+import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.json.Intelligence;
@@ -49,9 +50,9 @@ public class JsonParser {
 
         }
     }
-    public List<List<Subscriber>>  parseJson() {
+    public List<List<?>>  parseJson() {
 
-        LinkedList<List<Subscriber>> toReturn = new LinkedList();
+        LinkedList<List<?>> toReturn = new LinkedList();
 
 
         try {
@@ -113,6 +114,13 @@ public class JsonParser {
                 k++;
             }
             toReturn.add(listint);
+
+            //TimeService
+            logM.log.info("Creating " + 1 + " TimeService Services");
+            LinkedList<Publisher> listTime = new LinkedList<>();
+            listTime.add(new TimeService(event.getServices().getTime()));
+            toReturn.add(listTime);
+
             logM.log.info("Json parse finished successfully ");
 
 

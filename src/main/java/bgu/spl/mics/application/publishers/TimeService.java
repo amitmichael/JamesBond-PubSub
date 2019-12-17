@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.publishers;
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.subscribers.Q;
 
 import java.sql.Time;
 import java.util.Date;
@@ -29,6 +30,8 @@ public class TimeService extends Publisher {
 	 *
 	 * @param duration the number of ticks before termination
 	 */
+
+
 	public TimeService(int duration) {
 		super("TimeService");
 		this.termination = duration;
@@ -38,7 +41,7 @@ public class TimeService extends Publisher {
 			@Override
 			public synchronized void run() {
 					if (count <= termination) {
-						TickBroadcast toSend = new TickBroadcast(System.currentTimeMillis());
+						TickBroadcast toSend = new TickBroadcast(count);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
 						getSimplePublisher().sendBroadcast(toSend);
 						count++;
@@ -58,6 +61,7 @@ public class TimeService extends Publisher {
 
 	@Override
 	public void run() {
+		initialize();
 		timer.schedule(task, 0, 100);
 	}
 }

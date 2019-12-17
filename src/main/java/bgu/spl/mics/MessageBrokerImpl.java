@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * The {@link MessageBrokerImpl class is the implementation of the MessageBroker interface.
@@ -15,16 +17,16 @@ import java.util.Queue;
 public class MessageBrokerImpl implements MessageBroker {
 
 	private static class singletonHolder{ private static MessageBroker MessageBrokerInstance = new MessageBrokerImpl();}
-	private HashMap<Class, Queue<Subscriber>> topics; // will hold all topics in the broker
-	private HashMap<Subscriber, Queue<Message>> registered; //will hold all registered subscribers and their queues
-	private HashMap<Event,Future> resultMap;
+	private ConcurrentHashMap<Class, ConcurrentLinkedQueue<Subscriber>> topics; // will hold all topics in the broker
+	private ConcurrentHashMap<Subscriber, ConcurrentLinkedQueue<Message>> registered; //will hold all registered subscribers and their queues
+	private ConcurrentHashMap<Event,Future> resultMap;
 	private LogManager logM = LogManager.getInstance();
 
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");
-		topics = new HashMap<Class, Queue<Subscriber>>();
-		registered = new HashMap<Subscriber, Queue<Message>>();
-		resultMap = new HashMap<Event,Future>();
+		topics = new ConcurrentHashMap<Class, ConcurrentLinkedQueue<Subscriber>>();
+		registered = new ConcurrentHashMap<Subscriber, ConcurrentLinkedQueue<Message>>();
+		resultMap = new ConcurrentHashMap<Event,Future>();
 	}
 
 	/**
@@ -38,7 +40,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public  <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
 		synchronized (topics) {
 			if (!topics.containsKey(type)) { // if topic does not exists
-				topics.put(type, new LinkedList<Subscriber>());
+				topics.put(type, new ConcurrentLinkedQueue<Subscriber>());
 			}
 			topics.get(type).add(m); // add the subscriber to topic list
 			logM.log.info("Subscriber " + m.getName() + " Subscribed to " + type);
@@ -49,7 +51,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
 		synchronized (topics) {
 			if (!topics.containsKey(type)) { // if topic does not exists
-				topics.put(type, new LinkedList<Subscriber>());
+				topics.put(type, new ConcurrentLinkedQueue<Subscriber>());
 			}
 			topics.get(type).add(m); // add the subscriber to topic list
 		}
@@ -70,7 +72,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
 		if (!topics.containsKey(b.getClass())) {
-			topics.put(b.getClass(), new LinkedList());
+			topics.put(b.getClass(), new ConcurrentLinkedQueue());
 			logM.log.info("topic " + b.getClass() + " added");
 		}
 		if (topics.containsKey(b.getClass())) {
@@ -83,8 +85,9 @@ public class MessageBrokerImpl implements MessageBroker {
 					Subscriber currsub = (Subscriber) curr;
 					registered.get(currsub).add(b); // add b to subscriber queue
 					logM.log.info("Broadcast msg added to " + currsub.getName() + " queue");
+					synchronized (currsub){
 					currsub.notify();
-				}
+				}}
 			} else {
 				logM.log.warning("Distribution list is empty");
 			}
@@ -101,7 +104,7 @@ public class MessageBrokerImpl implements MessageBroker {
 		resultMap.put(e,fut);
 
 		if (!topics.containsKey(e.getClass())){
-			topics.put(e.getClass(), new LinkedList<Subscriber>() {
+			topics.put(e.getClass(), new ConcurrentLinkedQueue<Subscriber>() {
 			});
 		}
 		if (!topics.get(e.getClass()).isEmpty()) {
@@ -119,7 +122,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void register(Subscriber m) {
 		if (registered.containsKey(m))
 			logM.log.warning("Attempt to register exists subscriber: " + m.getName());
-		registered.put(m, new LinkedList<>());
+		registered.put(m, new ConcurrentLinkedQueue<>());
 		logM.log.info("Subscriber " + m.getName() + " registered");
 
 	}
@@ -162,9 +165,7 @@ public class MessageBrokerImpl implements MessageBroker {
 				return registered.get(m).poll();
 			}
 	}
-	public HashMap getResultMap(){ //TBD to delete !!!
-		return resultMap;
-	}
+
 }
 
 
