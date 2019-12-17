@@ -19,7 +19,7 @@ import static bgu.spl.mics.MessageBrokerImpl.getInstance;
  */
 public class M extends Subscriber {
 	private LogManager logM = LogManager.getInstance();
-	long timeTick;
+	int timeTick;
 	private Diary diary = Diary.getInstance();
 	private Report report;
 
@@ -44,7 +44,7 @@ public class M extends Subscriber {
 			public void call(Object c) throws InterruptedException {
 				if (c instanceof MissionReceivedEvent) {
 					MissionReceivedEvent event = (MissionReceivedEvent) c;
-					long timeExpired = event.getInfo().getTimeExpired();
+					int timeExpired = event.getInfo().getTimeExpired();
 					logM.log.info("new TimeExpired assigned");
 					GadgetAvailableEvent eventG = new GadgetAvailableEvent(event.getInfo().getGadget());
 					AgentsAvailableEvent eventA = new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers());
@@ -57,15 +57,16 @@ public class M extends Subscriber {
 					try {
 						if (result1.equals("true") & result2.equals("true")) {
 							if (timeTick <= timeExpired) {
-								//MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission());
+								MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission());
 								logM.log.info("Subscriber " + getName() + " sending ExcuteMission");
 							} else {
-								//MessageBrokerImpl.getInstance().sendEvent(new AbortMission());
+								MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
+								//String result4=(String) fut4.get();
 								logM.log.warning("Subscriber " + getName() + " sending AbortMission due to time expired");
 							}
 						}
 						else {
-							//MessageBrokerImpl.getInstance().sendEvent(new AbortMission());
+							MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
 							logM.log.warning("Subscriber " + getName() + " sending AbortMission due to missing condition");
 						}
 					}catch (NullPointerException e){logM.log.severe( "Time: "+ timeTick + " " + event.getInfo().getMissionName() + " futur1 " + (fut1==null) + " futuer2 " + (fut2==null));}
