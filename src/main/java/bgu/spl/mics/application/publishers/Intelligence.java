@@ -1,7 +1,11 @@
 package bgu.spl.mics.application.publishers;
 
+import bgu.spl.mics.LogManager;
 import bgu.spl.mics.Publisher;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.passiveObjects.MissionInfo;
+
+import java.util.List;
 
 /**
  * A Publisher only.
@@ -11,9 +15,14 @@ import bgu.spl.mics.Subscriber;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class Intelligence extends Publisher {
+	private List<MissionInfo> missions;
+	private LogManager logM = LogManager.getInstance();
 
-	public Intelligence() {
-		super("Change_This_Name");
+	public Intelligence(String name,List<MissionInfo> m) {
+		super(name);
+		missions = m;
+		logM.log.info(name + " created with " + m.size() + " missions");
+
 		// TODO Implement this
 	}
 

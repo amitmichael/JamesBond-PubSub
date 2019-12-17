@@ -26,6 +26,8 @@ public class Squad {
 
 	private Squad(){
 		agents = new HashMap<String, Agent>();
+		logM.log.info("Squad constructor was called");
+
 	}
 
 	public static Squad getInstance() {
@@ -39,9 +41,13 @@ public class Squad {
 	 * 						of the squad.
 	 */
 	public void load (Agent[] agents) {
+		logM.log.info("Squad Load start, agents size: " + this.agents.size());
+
 		for (int i=0; i< agents.length;i++){
 			this.agents.put(agents[i].getSerialNumber(),agents[i]);
 		}
+		logM.log.info("Squad Load finished, agents size: " + this.agents.size());
+
 	}
 
 	/**
@@ -79,10 +85,11 @@ public class Squad {
 		boolean done=true;
 		Iterator iter=serials.iterator();
 		while (iter.hasNext()&done){
-			Agent next=agents.get(iter.next());
-			if (!this.agents.containsKey(next.getSerialNumber())){ // agent is not in the squad
+			String tmp = (String) iter.next();
+			Agent next=agents.get(tmp);
+			if (next==null){ // agent is not in the squad
 				done=false;
-				logM.log.severe("agent " + next.getSerialNumber() + " is not in the squad");
+				logM.log.severe("agent " + tmp+ " is not in the squad");
 			}
 			else
 				next.acquire();

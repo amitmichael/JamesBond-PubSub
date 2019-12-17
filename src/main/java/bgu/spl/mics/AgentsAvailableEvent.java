@@ -16,11 +16,12 @@ public class AgentsAvailableEvent implements Event<String> {
     public Future getFut(){
         return fut;
     }
-    public List<String> getserials(){
+    public List<String> getserials() {
         return serials;
-      
+    }
     @Override
     public void setFuture(Future fut) {
+        this.fut=fut;
 
     }
 }

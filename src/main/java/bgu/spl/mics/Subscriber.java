@@ -1,6 +1,7 @@
 package bgu.spl.mics;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The Subscriber is an abstract class that any subscriber in the system
@@ -52,7 +53,7 @@ public abstract class Subscriber extends RunnableSubPub {
      *                 {@code type} are taken from this Subscriber message
      *                 queue.
      */
-    protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
+    protected synchronized final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
         MessageBrokerImpl.getInstance().subscribeEvent(type,this);
         callbackmap.put(type,callback);
     }
@@ -122,7 +123,14 @@ public abstract class Subscriber extends RunnableSubPub {
                 e.printStackTrace();
             }
             if (callbackmap.containsKey(msg.getClass())) {
-                callbackmap.get(msg.getClass()).call(msg);//dont forget msg contains reference to future
+                logM.log.info("callback was found, calling call");
+                try {
+                    callbackmap.get(msg.getClass()).call(msg);//dont forget msg contains reference to future
+                } catch (TimeoutException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             else {
                 logM.log.warning("Callback not found");

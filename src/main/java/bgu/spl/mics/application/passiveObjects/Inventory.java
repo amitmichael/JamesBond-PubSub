@@ -1,9 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.LogManager;
-import bgu.spl.mics.jsonHandler;
+import bgu.spl.mics.JsonParser;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,7 +76,7 @@ public class Inventory {
 	 */
 	public void printToFile(String filename){
 
-		jsonHandler json = new jsonHandler(filename);
+		JsonParser json = new JsonParser(filename);
 		json.printTofile(gadgets);
 
 	}

@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.JsonParser;
 import bgu.spl.mics.LogManager;
-import bgu.spl.mics.jsonHandler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class Diary {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
-		jsonHandler json = new jsonHandler(filename);
+		JsonParser json = new JsonParser(filename);
 		json.printTofile(reports);
 	}
 

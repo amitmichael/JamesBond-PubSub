@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Future<T> {
 	private T result;
+	private boolean success;
 	private LogManager logM = LogManager.getInstance();
 
 
@@ -19,7 +20,8 @@ public class Future<T> {
 	 * This should be the the only public constructor in this class.
 	 */
 	public Future() {
-		//TODO: implement this
+		success=false;
+		result=null;
 	}
 	
 	/**
@@ -46,7 +48,9 @@ public class Future<T> {
 	public void resolve (T result) {
 		synchronized (this) {
 			this.result = result;
-			logM.log.info("Future resolved with result: " + result.toString());
+			if (result.equals("Done"))
+				success=true;
+			logM.log.info("Future resolved with result: " + result.toString() + " ,Success: " + success);
 			notifyAll(); // ?
 		}
 	}
