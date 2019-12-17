@@ -20,7 +20,6 @@ public class Report {
 	int timeIssued;
 	int qTime;
 	int timeCreated;
-	private LogManager logM = LogManager.getInstance();
 
 
 	public Report(String missionName,int m,int moneyPenny,List<String> agentsSerialNumbers,List<String> agentsNames,String gadgetName,int timeIssued, int qTime, int timeCreated){

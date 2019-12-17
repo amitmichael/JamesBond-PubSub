@@ -81,7 +81,7 @@ public class JsonParser {
             int numofServicesM = event.getServices().getM();
             logM.log.info("Creating " + numofServicesM + " M Services");
             for (int j=0; j< numofServicesM; j++){
-                listM.add(new M("M"+ (j+1)));
+                listM.add(new M("M"+ (j+1),(j+1)));
             }
             toReturn.add(listM);
 

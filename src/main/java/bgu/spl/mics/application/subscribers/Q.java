@@ -4,6 +4,8 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import sun.font.TrueTypeFont;
 
+import static javafx.scene.input.KeyCode.T;
+
 /**
  * Q is the only Subscriber\Publisher that has access to the {@link bgu.spl.mics.application.passiveObjects.Inventory}.
  *
@@ -15,6 +17,7 @@ public class Q extends Subscriber {
 		private static Q Qinstance = new Q();}
 	private LogManager logM = LogManager.getInstance();
 	private Inventory inv =Inventory.getInstance();
+	private int timeTick;
 
 
 	/**
@@ -34,6 +37,7 @@ public class Q extends Subscriber {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
 		subscribeToGadgetAvailableEvent();
+		subscribeToTickBroadCastEvent();
 
 	}
 
@@ -47,9 +51,10 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						MessageBrokerImpl.getInstance().complete(event,"true");
+						MessageBrokerImpl.getInstance().complete(event,  ""+timeTick);
 					} else {
-						MessageBrokerImpl.getInstance().complete(event,"Gadget " + gad+  " is not available");
+						MessageBrokerImpl.getInstance().complete(event,"false");
+						logM.log.warning("Gadget " + gad+  " is not available");
 					}
 				}
 				else {
@@ -58,6 +63,25 @@ public class Q extends Subscriber {
 			}
 		};
 		subscribeEvent(GadgetAvailableEvent.class, back);
+
+
+	}
+
+	private void subscribeToTickBroadCastEvent() {
+		Callback tickCallBack = new Callback() {
+			@Override
+			public void call(Object c) {
+				synchronized (this) {
+					if (c instanceof TickBroadcast) {
+						TickBroadcast msg = (TickBroadcast) c;
+						timeTick = msg.getTime();
+					} else {
+						logM.log.severe(getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
+					}
+				}
+			}
+		};
+		subscribeBroadcast(TickBroadcast.class, tickCallBack);
 
 
 	}

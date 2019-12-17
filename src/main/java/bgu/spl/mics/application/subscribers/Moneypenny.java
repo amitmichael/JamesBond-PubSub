@@ -2,7 +2,12 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Squad;
+import javafx.util.Pair;
+
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+
+import static javafx.scene.input.KeyCode.T;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -28,6 +33,43 @@ public class Moneypenny extends Subscriber {
 		MessageBrokerImpl.getInstance().register(this);
 		subscribeToAgentsAvailableEvent();
 		subscribeToAbortMission();
+		subscribeToExcuteMission();
+		subscribedToGetAgentNamesEvent();
+	}
+
+
+	private void subscribedToGetAgentNamesEvent() {
+		Callback back1 = new Callback() {
+			@Override
+			public void call(Object c)  {
+				if (c instanceof GetAgentNamesEvent) {
+					GetAgentNamesEvent event = (GetAgentNamesEvent) c;
+					MessageBrokerImpl.getInstance().complete(event, Squad.getInstance().getAgentsNames(event.getSerial()));
+
+				} else {
+					logM.log.warning("call is not of type GetAgentNamesEvent");
+				}
+			}
+		};
+		subscribeEvent(GetAgentNamesEvent.class, back1);
+
+	}
+
+	private void subscribeToExcuteMission() {
+		Callback back1 = new Callback() {
+			@Override
+			public void call(Object c) throws TimeoutException, InterruptedException {
+				if (c instanceof ExcuteMission) {
+					ExcuteMission event = (ExcuteMission) c;
+					Squad.getInstance().sendAgents(event.getserials(),event.getDuration());
+					logM.log.info("Send agents to Mission");
+					MessageBrokerImpl.getInstance().complete( event, serialNumber);
+				} else {
+					logM.log.warning("call is not of type ExcuteMission");
+				}
+			}
+		};
+		subscribeEvent(ExcuteMission.class,back1);
 	}
 
 	private void subscribeToAgentsAvailableEvent() {
@@ -71,6 +113,9 @@ public class Moneypenny extends Subscriber {
 		};
 		subscribeEvent(AbortMission.class, back);
 
+	}
+	public String getSerialNumber(){
+		return serialNumber;
 	}
 }
 
