@@ -59,6 +59,7 @@ public class JsonParser {
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(this.fileName));
             JsonEvent event = gson.fromJson(reader, JsonEvent.class);
+
             //Inventory
             Inventory.getInstance().load(event.getInventory());
 
@@ -78,7 +79,7 @@ public class JsonParser {
             LinkedList<Subscriber> listM = new LinkedList<>();
             int numofServicesM = event.getServices().getM();
             logM.log.info("Creating " + numofServicesM + " M Services");
-            for (int j=0; j< event.getServices().getM(); j++){
+            for (int j=0; j< numofServicesM; j++){
                 listM.add(new M("M"+ (j+1)));
             }
             toReturn.add(listM);
@@ -86,9 +87,8 @@ public class JsonParser {
             //MoneyPenny
             LinkedList<Subscriber> listMP = new LinkedList<>();
             int numofServicesMP = event.getServices().getMoneypenny();
-            ExecutorService executorMP = Executors.newFixedThreadPool(numofServicesMP);
             logM.log.info("Creating " + numofServicesMP + " Moneypenny Services");
-            for (int j=0; j< event.getServices().getMoneypenny(); j++){
+            for (int j=0; j< numofServicesMP; j++){
                 listMP.add(new  Moneypenny(""+(j+1)));
             }
             toReturn.add(listMP);
@@ -98,7 +98,6 @@ public class JsonParser {
             LinkedList<Subscriber> listint = new LinkedList<>();
             List<Intelligence> in = event.getServices().getIntelligence();
             int numofServicesInt = in.size();
-            ExecutorService executorInt = Executors.newFixedThreadPool(numofServicesInt);
             logM.log.info("Creating " + numofServicesInt + " Intelligence Services");
             Iterator it1 = in.iterator();
             int k=0;
@@ -125,7 +124,5 @@ public class JsonParser {
     }
 
 
-    public static void main(String[] args) throws FileNotFoundException {
 
-    }
 }

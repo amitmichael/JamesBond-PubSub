@@ -3,12 +3,15 @@ package bgu.spl.mics.application;
 import bgu.spl.mics.JsonParser;
 import bgu.spl.mics.LogManager;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.application.passiveObjects.Squad;
+import bgu.spl.mics.json.Intelligence;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
 
@@ -58,7 +61,6 @@ public class MI6Runner {
                 }
                 executorInt.shutdown();
             }
-
 
             /*
             Moneypenny mp1 = new Moneypenny("1");
