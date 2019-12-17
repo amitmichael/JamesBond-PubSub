@@ -4,8 +4,10 @@ import bgu.spl.mics.*;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.Squad;
+import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
+import bgu.spl.mics.application.subscribers.Q;
 import bgu.spl.mics.json.Intelligence;
 
 import java.util.*;
@@ -26,11 +28,16 @@ public class MI6Runner {
             //parse the json
 
             JsonParser js = new JsonParser(args[0]);
-            List<List<Subscriber>> services = js.parseJson();
+            List<List<?>> services = js.parseJson();
 
-            if (services.size() < 3)
-                logM.log.severe("json did not parse all 2 type of services");
+            ExecutorService executorSingeltons = Executors.newFixedThreadPool(1);
+            executorSingeltons.execute(Q.getInstance());;
+
+
+            if (services.size() < 4)
+                logM.log.severe("json did not parse all 4 type of services");
             else {
+
                 // run the executors
                 //M
                 ExecutorService executorM = Executors.newFixedThreadPool(services.get(0).size());
@@ -60,7 +67,16 @@ public class MI6Runner {
                     executorInt.execute((Subscriber) itint.next());
                 }
                 executorInt.shutdown();
+
+                sleep(100); //wait to all services finish initialization
+                //TimeService
+                ExecutorService executorTimeService = Executors.newFixedThreadPool(services.get(3).size());
+                logM.log.info("Executing " + services.get(3).size() + " executorTime services");
+                executorTimeService.execute((Publisher) services.get(3).get(0));
+                executorTimeService.shutdown();
+
             }
+
 
 /*
             Moneypenny mp1 = new Moneypenny("1");

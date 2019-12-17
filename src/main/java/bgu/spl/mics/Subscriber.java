@@ -80,6 +80,7 @@ public abstract class Subscriber extends RunnableSubPub {
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
         MessageBrokerImpl.getInstance().subscribeBroadcast(type,this);
+        callbackmap.put(type,callback);
     }
 
     /**
@@ -118,7 +119,7 @@ public abstract class Subscriber extends RunnableSubPub {
             Message msg = null;
             try {
                 msg = MessageBrokerImpl.getInstance().awaitMessage(this);
-                logM.log.info("msg received to subscriber " + this.getName());
+                logM.log.info("msg " + msg.getClass() + " received to subscriber " + this.getName());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

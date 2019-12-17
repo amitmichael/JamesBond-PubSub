@@ -25,6 +25,7 @@ public class M extends Subscriber {
 	private Report report;
 
 
+
 	public M(String name) {
 		super(name);
 		this.name=name;//name specific for M instance
