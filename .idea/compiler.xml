@@ -8,7 +8,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="untitled" />
         <module name="Ass2_New" />
-        <module name="Ass2" />
       </profile>
     </annotationProcessing>
   </component>

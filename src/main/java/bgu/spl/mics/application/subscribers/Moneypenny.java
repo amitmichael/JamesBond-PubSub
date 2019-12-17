@@ -20,7 +20,7 @@ public class Moneypenny extends Subscriber {
 
 
 	public Moneypenny(String serialNumber) {
-		super("MoneyPenny");
+		super("MoneyPenny" + serialNumber);
 		this.serialNumber = serialNumber;
 	}
 

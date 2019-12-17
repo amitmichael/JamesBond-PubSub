@@ -1,5 +1,7 @@
 package bgu.spl.mics;
+import bgu.spl.mics.json.JsonEvent;
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
 import jdk.nashorn.internal.parser.JSONParser;
 
 import java.io.*;
@@ -35,26 +37,33 @@ public class jsonHandler {
 
         }
     }
-    public static String[] parseInventory(String section,String path)  {
-        ArrayList toReturn = new ArrayList();
+    public static String[] parseInventory(String section,String path) {
+
+//        ArrayList toReturn = new ArrayList();
         try {
-            JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = (JsonObject) jsonParser.parse(new FileReader(path));
-            JsonArray jsonArray = (JsonArray) jsonObject.get(section);
-            Iterator<?> iterator = jsonArray.iterator();
-            while (iterator.hasNext()) {
-                toReturn.add(iterator.next());
-            }
-        } catch (FileNotFoundException e){
-            logM.log.severe ("File" + path+ " not found");
+//            JsonParser jsonParser = new JsonParser();
+//            JsonObject jsonObject = (JsonObject) jsonParser.parse(new FileReader(path));
+//            JsonArray jsonArray = (JsonArray) jsonObject.get(section);
+//            Iterator<?> iterator = jsonArray.iterator();
+//            while (iterator.hasNext()) {
+//                toReturn.add(iterator.next());
+//            }
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(new FileReader(path));
+            JsonEvent event = gson.fromJson(reader, JsonEvent.class);
+            System.out.println(event);
+        } catch (FileNotFoundException e) {
+            logM.log.severe("File" + path + " not found");
         }
-            String[] arr = new String[toReturn.size()];
-        for ( int i=0; i< toReturn.size();i++){
-            String tmp = (toReturn.get(i).toString());
-            arr[i] =  (tmp).substring(1,tmp.length()-1);
-        }
-            return arr;
-        }
+//            String[] arr = new String[toReturn.size()];
+//        for ( int i=0; i< toReturn.size();i++){
+//            String tmp = (toReturn.get(i).toString());
+//            arr[i] =  (tmp).substring(1,tmp.length()-1);
+//        }
+//            return arr;
+//        }
+            return null;
+    }
 
 
 
