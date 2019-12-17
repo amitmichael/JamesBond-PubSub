@@ -25,7 +25,7 @@ public class Moneypenny extends Subscriber {
 	}
 
 	@Override
-	protected void initialize() {
+	protected synchronized void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
 			Callback back = new Callback() {
@@ -33,13 +33,12 @@ public class Moneypenny extends Subscriber {
 				public void call(Object c) {
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
-					Future fut = event.getFut();
 					try {
 						logM.log.info("squad is trying to execute agents");
 						squad.sendAgents(event.getserials(), 100); //?? time
-						fut.resolve("Agents executed");
+						MessageBrokerImpl.getInstance().complete(event,"Done");
 					} catch (TimeoutException | InterruptedException e) {
-						fut.resolve("Agents didnt executed");
+						MessageBrokerImpl.getInstance().complete(event,"Agents didnt executed");
 						logM.log.warning("sendAgents reached timeout");
 					}
 				}

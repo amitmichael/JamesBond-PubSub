@@ -8,5 +8,4 @@ package bgu.spl.mics;
  * the {@link MessageBroker}) must implement it.
  */
 public interface Message {
-    public void setFuture(Future fut);
 }

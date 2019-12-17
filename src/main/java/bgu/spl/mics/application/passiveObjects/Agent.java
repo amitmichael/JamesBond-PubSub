@@ -77,9 +77,11 @@ public class Agent {
 				logM.log.info("Waiting for agent " + this.name + " to be available");
 				wait();
 			}
+
+
+			logM.log.info("agent " + this.name + " acquired");
+			available = false;
 		}
-		logM.log.info("agent " + this.name + " acquired");
-		available =false;
 	}
 
 	/**

@@ -14,7 +14,5 @@ public class MissionReceivedEvent implements Event<String> {
         this.info = mission;
     }
 
-    public void setFuture(Future t){
-        this.fut = t;
-    }
+
 }

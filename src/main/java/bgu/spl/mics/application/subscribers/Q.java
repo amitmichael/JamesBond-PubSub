@@ -41,9 +41,9 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						event.getFut().resolve("Done");
+						MessageBrokerImpl.getInstance().complete(event,"Done");
 					} else {
-						event.getFut().resolve("Gadget " + gad+  " is not available");
+						MessageBrokerImpl.getInstance().complete(event,"Gadget " + gad+  " is not available");
 					}
 				}
 				else {

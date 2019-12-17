@@ -15,8 +15,5 @@ public class ExampleEvent implements Event<String>{
         return senderName;
     }
 
-    @Override
-    public void setFuture(Future fut) {
 
-    }
 }

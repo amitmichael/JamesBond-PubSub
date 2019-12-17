@@ -1,16 +1,14 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.JsonParser;
-import bgu.spl.mics.LogManager;
-import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.*;
+import bgu.spl.mics.Future;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.Squad;
+import bgu.spl.mics.application.subscribers.M;
+import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.json.Intelligence;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.sleep;
@@ -22,16 +20,18 @@ import static java.lang.Thread.sleep;
 public class MI6Runner {
     public static void main(String[] args) throws InterruptedException {
         LogManager logM = LogManager.getInstance();
-        if (args.length ==0) {
+        if (args.length == 0) {
             logM.log.severe("Enter input json path in program arguments");
         } else {
             //parse the json
+
             JsonParser js = new JsonParser(args[0]);
-            List<List<Subscriber>> services =  js.parseJson();
-            if (services.size() < 3 )
+            List<List<Subscriber>> services = js.parseJson();
+
+            if (services.size() < 3)
                 logM.log.severe("json did not parse all 2 type of services");
             else {
-            // run the executors
+                // run the executors
                 //M
                 ExecutorService executorM = Executors.newFixedThreadPool(services.get(0).size());
                 Iterator itm = services.get(0).iterator(); //iterator on M services
@@ -62,7 +62,7 @@ public class MI6Runner {
                 executorInt.shutdown();
             }
 
-            /*
+/*
             Moneypenny mp1 = new Moneypenny("1");
             Moneypenny mp2 = new Moneypenny("2");
             Thread t2 = new Thread(mp1);
@@ -76,13 +76,15 @@ public class MI6Runner {
             t3.start();
             AgentsAvailableEvent event1 = new AgentsAvailableEvent("",l1);
             AgentsAvailableEvent event2 = new AgentsAvailableEvent("",l1);
-            event1.setFuture(new Future<>());
-
+            MessageBrokerImpl.getInstance().getResultMap().put(event1,new Future<>());
+            MessageBrokerImpl.getInstance().getResultMap().put(event2,new Future<>());
             sleep(100);
 
             m2.getSimplePublisher().sendEvent(event1);
             m2.getSimplePublisher().sendEvent(event2);
-            */
+*/
         }
     }
 }
+
+
