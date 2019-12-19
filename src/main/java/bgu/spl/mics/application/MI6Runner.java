@@ -81,7 +81,9 @@ public class MI6Runner {
             //    ExecutorService executorTimeService = Executors.newFixedThreadPool(services.get(3).size());
                 logM.log.info("Executing " + services.get(3).size() + " executorTime services");
              //   executorTimeService.execute((Publisher) services.get(3).get(0));
-                threads.add(new Thread((Publisher) services.get(3).get(0)));
+                TimeService timeser = (TimeService) services.get(3).get(0);
+                timeser.setThreads(threads);
+                threads.add(new Thread(timeser));
              //   executorTimeService.shutdown();
 
             }

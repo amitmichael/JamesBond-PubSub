@@ -4,6 +4,7 @@ import bgu.spl.mics.application.subscribers.Q;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +24,7 @@ public class TimeService extends Publisher {
 	private Timer timer;
 	private TimerTask task;
 	private LogManager logM = LogManager.getInstance();
-	private AtomicBoolean running = new AtomicBoolean(false);
+	private List<Thread> threads;
 
 
 	/**
@@ -48,10 +49,16 @@ public class TimeService extends Publisher {
 					}
 					else {
 						timer.cancel();
+						for (Thread t : threads){
+							t.interrupt();
+						}
 					}
 				}
 
 		};
+	}
+	public void setThreads(List<Thread> t){
+		this.threads = t;
 	}
 
 	@Override
