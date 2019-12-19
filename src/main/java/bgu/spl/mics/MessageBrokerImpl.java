@@ -170,14 +170,17 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public Message awaitMessage(Subscriber m)   {
 		logM.log.info(m.getName() + " waiting for msg");
-		try {
-			return registered.get(m).take();
+		if (registered.get(m)!=null) {
+			try {
+				return registered.get(m).take();
 
-		} catch (InterruptedException e){
-			m.terminate();
-			logM.log.warning(m.getName()+ " terminating");
-			return null;
+			} catch (InterruptedException e) {
+				m.terminate();
+				logM.log.warning(m.getName() + " terminating");
+				return null;
+			}
 		}
+		else return null;
 
 	}
 }

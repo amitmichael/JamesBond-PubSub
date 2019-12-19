@@ -2,6 +2,12 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Squad;
+import com.sun.xml.internal.ws.policy.EffectiveAlternativeSelector;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -63,7 +69,7 @@ public class Moneypenny extends Subscriber {
 				if (c instanceof ExecuteMission) {
 					try {
 						ExecuteMission event = (ExecuteMission) c;
-					Squad.getInstance().sendAgents(event.getserials(), event.getDuration() * 100);
+					Squad.getInstance().sendAgents(event.getserials(), event.getDuration()*100);
 					logM.log.info("Send agents to Mission");
 					MessageBrokerImpl.getInstance().complete(event, serialNumber);
 				} catch(InterruptedException ex ){terminate();}
@@ -77,22 +83,42 @@ public class Moneypenny extends Subscriber {
 
 	private void subscribeToAgentsAvailableEvent() {
 		Callback back = new Callback() {
+			private Boolean result = null;
+			private Boolean semiTerminate = false;
 			@Override
 			public void call(Object c)  {
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
 
 					logM.log.info("squad is trying to execute agents");
-					try {
-						Boolean result = squad.getAgents(event.getserials());
+					Timer timer = new Timer(true);
+					TimerTask  interrupt = new TimerTask() {
+						@Override
+						public void run() {
+							if (result==null) {
+								semiTerminate=true;
+								System.out.println("Timeout");
+								Thread.currentThread().interrupt();
+							}
+						}
+					};
+					timer.schedule(interrupt, 0,event.getTimeout());
+					try  {
+						result = squad.getAgents(event.getserials());
 						if (result == true) {
 							MessageBrokerImpl.getInstance().complete(event, serialNumber);
 						} else {
 							MessageBrokerImpl.getInstance().complete(event, null);
 						}
 					} catch (InterruptedException e){
-						terminate();
-						logM.log.warning(getName() + " terminating");
+						if (semiTerminate){
+							semiTerminate=false;
+							MessageBrokerImpl.getInstance().complete(event, null);
+						}
+						else {
+							terminate();
+							logM.log.warning(getName() + " terminating");
+						}
 						;}
 
 				} else {

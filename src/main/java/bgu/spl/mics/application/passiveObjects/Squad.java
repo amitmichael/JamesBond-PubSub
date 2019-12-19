@@ -64,12 +64,10 @@ public class Squad {
 	 * simulates executing a mission by calling sleep.
 	 * @param time   milliseconds to sleep
 	 */
-	public void sendAgents(List<String> serials, int time) throws InterruptedException {
+	public  void sendAgents(List<String> serials, int time) throws InterruptedException {
 			logM.log.info("Sending agents to Mission");
 			sleep(time);
 			releaseAgents(serials);
-
-
 	}
 
 	/**
@@ -77,21 +75,19 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials) throws InterruptedException {
-		boolean done=true;
+	public synchronized boolean getAgents(List<String> serials) throws InterruptedException {
 		Iterator iter=serials.iterator();
-		while (iter.hasNext()&done){
+		while (iter.hasNext()){
 			String tmp = (String) iter.next();
 			Agent next=agents.get(tmp);
 			if (next==null){ // agent is not in the squad
-				done=false;
 				logM.log.severe("agent " + tmp+ " is not in the squad");
+				return false;
 			}
 			else
 				next.acquire();
 		}
-
-		return done;
+		return true;
 	}
 
     /**

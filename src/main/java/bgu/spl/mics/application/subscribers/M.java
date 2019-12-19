@@ -54,7 +54,7 @@ public class M extends Subscriber {
 
 					logM.log.info(getName() +" Time: " + timeTick + " " + "new TimeExpired assigned");
 					GadgetAvailableEvent eventG = new GadgetAvailableEvent(event.getInfo().getGadget());
-					AgentsAvailableEvent eventA = new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers());
+					AgentsAvailableEvent eventA = new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers(),(timeExpired-timeTick)*100);
 
 					///try to acquire the agent
 					Future fut2 = getSimplePublisher().sendEvent(eventA);
