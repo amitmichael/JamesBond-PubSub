@@ -1,6 +1,5 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 
 

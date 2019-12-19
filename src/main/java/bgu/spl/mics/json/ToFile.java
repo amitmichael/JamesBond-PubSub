@@ -1,10 +1,10 @@
 package bgu.spl.mics.json;
 
-import java.util.List;
-
 import bgu.spl.mics.application.passiveObjects.Report;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class ToFile {
 

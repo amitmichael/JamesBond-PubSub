@@ -2,7 +2,6 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.JsonParser;
 import bgu.spl.mics.LogManager;
-import com.sun.org.apache.xalan.internal.res.XSLTErrorResources;
 
 import java.util.LinkedList;
 import java.util.List;

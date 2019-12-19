@@ -1,6 +1,7 @@
 package bgu.spl.mics;
 
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -115,27 +116,28 @@ public abstract class Subscriber extends RunnableSubPub {
 
             initialize();
 
-
         while (!terminated) {
             Message msg = null;
-
             try {
                 msg = MessageBrokerImpl.getInstance().awaitMessage(this);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                terminate();
+                logM.log.warning(getName() + " terminating");
             }
             if (msg!=null)
                 logM.log.info("msg " + msg.getClass() + " received to subscriber " + this.getName());
 
             if (msg!=null && callbackmap.containsKey(msg.getClass())) {
                 logM.log.info("callback was found, calling call");
+                //logM.log.severe(getName() + " %%%%Start%%%% " + System.currentTimeMillis() + " " + Thread.currentThread());
                 try {
-                    callbackmap.get(msg.getClass()).call(msg);//dont forget msg contains reference to future
-                } catch (TimeoutException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    callbackmap.get(msg.getClass()).call(msg);
+                } catch (TimeoutException | InterruptedException e) { terminate(); }
+                //CallManager cm = new CallManager(msg,callbackmap.get(msg.getClass()));
+                //Thread t = new Thread(cm);
+                //t.run();
+                //logM.log.severe(getName() + " %%%%end%%%% " + System.currentTimeMillis());
+
             }
             else {
                 if(msg !=null)

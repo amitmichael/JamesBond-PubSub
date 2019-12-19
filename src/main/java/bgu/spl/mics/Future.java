@@ -50,9 +50,10 @@ public class Future<T> {
 	public void resolve (T result) {
 		synchronized (this) {
 			this.result = result;
-			if (result.equals("true"))
-				success=true;
-			logM.log.info("Future resolved with result: " + result.toString() + " ,Success: " + success);
+			if (result!=null  && result.equals("true")) {
+				success = true;
+				logM.log.info("Future resolved with result: " + result.toString() + " ,Success: " + success);
+			}
 			notifyAll();
 		}
 	}
@@ -75,26 +76,23 @@ public class Future<T> {
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-	public T get(long timeout, TimeUnit unit) {
+	public T get(long timeout, TimeUnit unit) throws InterruptedException {
 		synchronized (this) {
 			long timeoutinMil = unit.toMillis(timeout);
+			logM.log.info("" + timeoutinMil);
 			if (isDone())
 				return result;
 			else {
-				try {
 					wait(timeoutinMil);
-				} catch (InterruptedException e) {
-					logM.log.severe("InterruptedException 1");
-				}
+
 				if (isDone()) {
 					return result;
 				} else {
 					logM.log.warning("Future get reached timeout ");
-					result = (T) "Timeout";
 				}
 			}
 		}
-		return result;
+		return null;
 	}
 
 

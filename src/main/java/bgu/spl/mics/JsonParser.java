@@ -1,4 +1,5 @@
 package bgu.spl.mics;
+
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Inventory;
@@ -7,17 +8,14 @@ import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.json.*;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static java.lang.Thread.sleep;
 
 public class JsonParser {
     private String fileName;
@@ -49,8 +47,6 @@ public class JsonParser {
 
         else {
             File file = new File(fileName);
-            if (file.exists()) // if file with the same name already exists print error
-                logM.log.warning("file name " + fileName + " already exists");
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             try (FileWriter fw = new FileWriter(fileName)) { //write the gadgets to json file
                 logM.log.info("File " + fileName + " Created");

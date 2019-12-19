@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import bgu.spl.mics.LogManager;
 import bgu.spl.mics.JsonParser;
+import bgu.spl.mics.LogManager;
 
 import java.util.LinkedList;
 import java.util.List;

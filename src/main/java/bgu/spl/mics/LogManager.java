@@ -9,7 +9,7 @@ import java.util.logging.SimpleFormatter;
 public class LogManager {
     public Logger log;
     private static class singletonHolder{
-        private static LogManager logInstance = new LogManager("SPL2Log.log");}
+        private static LogManager logInstance = new LogManager("SPL2.log");}
     FileHandler fh;
 
     private LogManager(String path){

@@ -1,12 +1,8 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Inventory;
-
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -16,6 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBrokerImpl implements MessageBroker {
+
 
 	private static class singletonHolder {
 		private static MessageBroker MessageBrokerInstance = new MessageBrokerImpl();
@@ -72,6 +69,8 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public void sendBroadcast(Broadcast b)   {
+		Long start = System.currentTimeMillis();
+
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
 		if (!topics.containsKey(b.getClass())) {
@@ -88,7 +87,7 @@ public class MessageBrokerImpl implements MessageBroker {
 					if (registered.get(currsub) != null) {
 						try {
 							registered.get(currsub).put(b); // add b to subscriber queue
-							logM.log.info("Broadcast msg added to " + currsub.getName() + " queue");
+							logM.log.info("%% "+ System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
 						} catch (InterruptedException ex) {
 							logM.log.severe("InterruptedException");
 						}
@@ -100,6 +99,8 @@ public class MessageBrokerImpl implements MessageBroker {
 		} else {
 			logM.log.severe("topic does not exists");
 		}
+		Long end = System.currentTimeMillis();
+		logM.log.info("sendBroadcast duration " + Math.subtractExact(end,start));
 	}
 
 
@@ -116,8 +117,10 @@ public class MessageBrokerImpl implements MessageBroker {
 		if (!topics.get(e.getClass()).isEmpty()) {
 			try {
 				Subscriber curr = topics.get(e.getClass()).poll();
-				registered.get(curr).put(e); //add the msg to curr queue
-				topics.get(e.getClass()).put(curr); //add curr to the topic queue
+				if (registered.get(curr)!=null) {
+					registered.get(curr).put(e); //add the msg to curr queue
+					topics.get(e.getClass()).put(curr); //add curr to the topic queue
+				}
 			} catch (InterruptedException ex) {
 				logM.log.severe("InterruptedException");
 			}
@@ -168,7 +171,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public Message awaitMessage(Subscriber m)   {
 		logM.log.info(m.getName() + " waiting for msg");
 		try {
-			return  registered.get(m).take();
+			return registered.get(m).take();
 
 		} catch (InterruptedException e){
 			m.terminate();

@@ -3,7 +3,6 @@ package bgu.spl.mics.application.subscribers;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Squad;
 
-import java.util.concurrent.TimeoutException;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -27,10 +26,16 @@ public class Moneypenny extends Subscriber {
 	protected synchronized void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
-		subscribeToAgentsAvailableEvent();
-		subscribeToAbortMission();
-		subscribeToExcuteMission();
-		subscribedToGetAgentNamesEvent();
+		if (serialNumber.equals("1")) { //first MP will handle only those events
+			subscribeToAbortMission();
+			subscribeToExcuteMission();
+			subscribedToGetAgentNamesEvent();
+		} else {
+			subscribeToAgentsAvailableEvent();
+			subscribeToAbortMission();
+			subscribeToExcuteMission();
+			subscribedToGetAgentNamesEvent();
+		}
 	}
 
 
@@ -54,12 +59,14 @@ public class Moneypenny extends Subscriber {
 	private void subscribeToExcuteMission() {
 		Callback back1 = new Callback() {
 			@Override
-			public void call(Object c) throws TimeoutException, InterruptedException {
+			public void call(Object c) {
 				if (c instanceof ExecuteMission) {
-					ExecuteMission event = (ExecuteMission) c;
-					Squad.getInstance().sendAgents(event.getserials(),event.getDuration());
+					try {
+						ExecuteMission event = (ExecuteMission) c;
+					Squad.getInstance().sendAgents(event.getserials(), event.getDuration() * 100);
 					logM.log.info("Send agents to Mission");
-					MessageBrokerImpl.getInstance().complete( event, serialNumber);
+					MessageBrokerImpl.getInstance().complete(event, serialNumber);
+				} catch(InterruptedException ex ){terminate();}
 				} else {
 					logM.log.warning("call is not of type ExecuteMission");
 				}
@@ -71,18 +78,23 @@ public class Moneypenny extends Subscriber {
 	private void subscribeToAgentsAvailableEvent() {
 		Callback back = new Callback() {
 			@Override
-			public void call(Object c) throws InterruptedException {
+			public void call(Object c)  {
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
 
 					logM.log.info("squad is trying to execute agents");
-					Boolean result = squad.getAgents(event.getserials());
-					MessageBrokerImpl.getInstance().complete(event, result.toString());
+					try {
+						Boolean result = squad.getAgents(event.getserials());
+						if (result == true) {
+							MessageBrokerImpl.getInstance().complete(event, serialNumber);
+						} else {
+							MessageBrokerImpl.getInstance().complete(event, null);
+						}
+					} catch (InterruptedException e){
+						terminate();
+						logM.log.warning(getName() + " terminating");
+						;}
 
-					/*} catch ( InterruptedException e) {
-						MessageBrokerImpl.getInstance().complete(event,"Agents didnt executed");
-						logM.log.warning("sendAgents reached timeout");
-					}*/
 				} else {
 					logM.log.warning("call is not of type AgentAvilableEvent");
 				}

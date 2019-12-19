@@ -1,8 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
+
 import bgu.spl.mics.LogManager;
 
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 import static java.lang.Thread.sleep;
 
@@ -65,9 +65,11 @@ public class Squad {
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time) throws InterruptedException {
-			 logM.log.info("Sending agents to Mission");
-				sleep(time);
-			 releaseAgents(serials);
+			logM.log.info("Sending agents to Mission");
+			sleep(time);
+			releaseAgents(serials);
+
+
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials)  {
+	public boolean getAgents(List<String> serials) throws InterruptedException {
 		boolean done=true;
 		Iterator iter=serials.iterator();
 		while (iter.hasNext()&done){

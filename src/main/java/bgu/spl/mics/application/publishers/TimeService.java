@@ -1,13 +1,12 @@
 package bgu.spl.mics.application.publishers;
-import bgu.spl.mics.*;
-import bgu.spl.mics.application.subscribers.Q;
 
-import java.sql.Time;
-import java.util.Date;
+import bgu.spl.mics.LogManager;
+import bgu.spl.mics.Publisher;
+import bgu.spl.mics.TickBroadcast;
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TimeService is the global system timer There is only one instance of this Publisher.
@@ -41,6 +40,7 @@ public class TimeService extends Publisher {
 		task = new TimerTask() {
 			@Override
 			public synchronized void run() {
+				long start = System.currentTimeMillis();
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(count);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
@@ -54,7 +54,10 @@ public class TimeService extends Publisher {
 							logM.log.info("$$ Interrupt to thread " + t.getName());
 						}
 					}
+				long end = System.currentTimeMillis();
+				logM.log.info("TimeService Timetick duration " + Math.subtractExact(end,start));
 				}
+
 
 		};
 	}
