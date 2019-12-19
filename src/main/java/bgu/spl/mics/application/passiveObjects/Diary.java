@@ -66,7 +66,7 @@ public class Diary {
 	 */
 	public void printToFile(String filename){
 		JsonParser json = new JsonParser(filename);
-		json.printTofile(reports);
+		json.printToFileDiary(this);
 	}
 
 	/**

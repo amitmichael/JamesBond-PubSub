@@ -2,12 +2,8 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Squad;
-import javafx.util.Pair;
 
-import java.util.List;
 import java.util.concurrent.TimeoutException;
-
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -59,17 +55,17 @@ public class Moneypenny extends Subscriber {
 		Callback back1 = new Callback() {
 			@Override
 			public void call(Object c) throws TimeoutException, InterruptedException {
-				if (c instanceof ExcuteMission) {
-					ExcuteMission event = (ExcuteMission) c;
+				if (c instanceof ExecuteMission) {
+					ExecuteMission event = (ExecuteMission) c;
 					Squad.getInstance().sendAgents(event.getserials(),event.getDuration());
 					logM.log.info("Send agents to Mission");
 					MessageBrokerImpl.getInstance().complete( event, serialNumber);
 				} else {
-					logM.log.warning("call is not of type ExcuteMission");
+					logM.log.warning("call is not of type ExecuteMission");
 				}
 			}
 		};
-		subscribeEvent(ExcuteMission.class,back1);
+		subscribeEvent(ExecuteMission.class,back1);
 	}
 
 	private void subscribeToAgentsAvailableEvent() {

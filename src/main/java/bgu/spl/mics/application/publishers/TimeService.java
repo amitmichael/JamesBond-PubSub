@@ -44,13 +44,14 @@ public class TimeService extends Publisher {
 					if (count <= termination) {
 						TickBroadcast toSend = new TickBroadcast(count);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
-						getSimplePublisher().sendBroadcast(toSend);
+							getSimplePublisher().sendBroadcast(toSend);
 						count++;
 					}
 					else {
 						timer.cancel();
 						for (Thread t : threads){
 							t.interrupt();
+							logM.log.info("$$ Interrupt to thread " + t.getName());
 						}
 					}
 				}

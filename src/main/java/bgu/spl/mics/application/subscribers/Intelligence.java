@@ -42,7 +42,7 @@ public class Intelligence extends Subscriber {
 		subscribeToTickBroadCastEvent();
 	}
 
-	private void sendMissions(MissionInfo m)   {
+	private void sendMissions(MissionInfo m) throws InterruptedException {
 		getSimplePublisher().sendEvent(new MissionReceivedEvent("MRE",m));
 		logM.log.info("Time: " + timeTick + " Msg: Sending MRE for mission " + m.getMissionName() + " time issued: " + m.getTimeIssued());
 		missions.remove(m);
@@ -53,7 +53,7 @@ public class Intelligence extends Subscriber {
 	private void subscribeToTickBroadCastEvent(){
 		Callback tickCallBack = new Callback() {
 			@Override
-			public void call(Object c) {
+			public void call(Object c) throws InterruptedException {
 				synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;

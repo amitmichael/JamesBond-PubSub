@@ -24,14 +24,16 @@ public class MI6Runner {
     public static void main(String[] args) throws InterruptedException {
         List<Thread> threads = new LinkedList<>();
         LogManager logM = LogManager.getInstance();
-        if (args.length == 0) {
-            logM.log.severe("Enter input json path in program arguments");
+        if (args.length < 3) {
+            logM.log.severe("Enter input&Output json path in program arguments");
         } else {
             //parse the json
             ////////////////////////////////
             JsonParser js = new JsonParser(args[0]);
             List<List<?>> services = js.parseJson();
-            threads.add(new Thread(Q.getInstance()));
+            Thread t = new Thread(Q.getInstance());
+            t.setName("Q");
+            threads.add(t);
             if (services.size() < 4)
                 logM.log.severe("json did not parse all 4 type of services");
             else {
@@ -39,37 +41,46 @@ public class MI6Runner {
                 // run the executors
                 //M
                 Iterator itm = services.get(0).iterator(); //iterator on M services
-                logM.log.info("Executing " + services.get(0).size() + " M services");
+                logM.log.info("Adding " + services.get(0).size() + " M services");
                 while (itm.hasNext()) {
-                    threads.add(new Thread((Subscriber) itm.next()));
+                    Subscriber curr = (Subscriber) itm.next();
+                    Thread t1 = new Thread(curr);
+                    t1.setName(curr.getName());
+                    threads.add(t1);
                 }
 
                 //MP
                 Iterator itmp = services.get(1).iterator(); //iterator on MoneyPenny services
-                logM.log.info("Executing " + services.get(1).size() + " MoneyPenny services");
+                logM.log.info("Adding " + services.get(1).size() + " MoneyPenny services");
                 while (itmp.hasNext()) {
-                    //   executorMP.execute((Subscriber) itmp.next());
-                    threads.add(new Thread((Subscriber) itmp.next()));
+                    Subscriber curr = (Subscriber) itmp.next();
+                    Thread t1 = new Thread(curr);
+                    t1.setName(curr.getName());
+                    threads.add(t1);
 
                 }
 
 
                 //Int
                 Iterator itint = services.get(2).iterator(); //iterator on Intelligence services
-                logM.log.info("Executing " + services.get(2).size() + " Intelligence services");
+                logM.log.info("Adding " + services.get(2).size() + " Intelligence services");
 
                 while (itint.hasNext()) {
-                    threads.add(new Thread((Subscriber) itint.next()));
+                    Subscriber curr = (Subscriber) itint.next();
+                    Thread t1 = new Thread(curr);
+                    t1.setName(curr.getName());
+                    threads.add(t1);
 
                 }
 
                 sleep(100); //wait to all services finish initialization
                 //TimeService
-                logM.log.info("Executing " + services.get(3).size() + " executorTime services");
-                //   executorTimeService.execute((Publisher) services.get(3).get(0));
+                logM.log.info("Adding " + services.get(3).size() + " executorTime services");
                 TimeService timeser = (TimeService) services.get(3).get(0);
                 timeser.setThreads(threads);
-                threads.add(new Thread(timeser));
+                Thread t1 = new Thread(timeser);
+                t1.setName("TimeService");
+                threads.add(t1);
 
             }
 
@@ -77,16 +88,17 @@ public class MI6Runner {
             ////////////////////////////////
 
 
-            for (Thread t : threads) {
-                t.start();
+            for (Thread tt : threads) {
+                tt.start();
             }
-            for (Thread t : threads) {
+            for (Thread tt : threads) {
                 try {
-                    t.join();
+                    tt.join();
                 } catch (InterruptedException e) {
                 }
             }
-            Diary.getInstance().printToFile("diaryTest.json");
+            Diary.getInstance().printToFile(args[1]);
+            Inventory.getInstance().printToFile(args[2]);
 
         }
     }

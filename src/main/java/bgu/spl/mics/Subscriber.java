@@ -118,13 +118,16 @@ public abstract class Subscriber extends RunnableSubPub {
 
         while (!terminated) {
             Message msg = null;
+
             try {
                 msg = MessageBrokerImpl.getInstance().awaitMessage(this);
-                logM.log.info("msg " + msg.getClass() + " received to subscriber " + this.getName());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (callbackmap.containsKey(msg.getClass())) {
+            if (msg!=null)
+                logM.log.info("msg " + msg.getClass() + " received to subscriber " + this.getName());
+
+            if (msg!=null && callbackmap.containsKey(msg.getClass())) {
                 logM.log.info("callback was found, calling call");
                 try {
                     callbackmap.get(msg.getClass()).call(msg);//dont forget msg contains reference to future
@@ -135,7 +138,10 @@ public abstract class Subscriber extends RunnableSubPub {
                 }
             }
             else {
-                logM.log.warning("Callback not found");
+                if(msg !=null)
+                    logM.log.warning("Callback not found");
+                else
+                    logM.log.warning("msg is null - terminating");
             }
         }
     }

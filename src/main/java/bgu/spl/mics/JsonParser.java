@@ -1,14 +1,12 @@
 package bgu.spl.mics;
 import bgu.spl.mics.application.passiveObjects.Agent;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
-import bgu.spl.mics.json.Intelligence;
-import bgu.spl.mics.json.JsonEvent;
-import bgu.spl.mics.json.Mission;
-import bgu.spl.mics.json.Squad;
+import bgu.spl.mics.json.*;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 
@@ -32,7 +30,20 @@ public class JsonParser {
     }
 
 
-    public void printTofile(List<?> toPrint ) {
+    public void printToFileDiary(Diary d) {
+        if (!fileName.contains(".json"))
+            logM.log.severe("file name is not from type json");
+
+        else {
+            ToFile print = new ToFile();
+            print.setReports(d.getReports());
+            print.setTotal(d.getTotal());
+            printTofile(print);
+        }
+
+    }
+
+    public void printTofile(Object toPrint) {
         if (!fileName.contains(".json"))
             logM.log.severe("file name is not from type json");
 
@@ -40,7 +51,7 @@ public class JsonParser {
             File file = new File(fileName);
             if (file.exists()) // if file with the same name already exists print error
                 logM.log.warning("file name " + fileName + " already exists");
-            Gson gson = new GsonBuilder().create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             try (FileWriter fw = new FileWriter(fileName)) { //write the gadgets to json file
                 logM.log.info("File " + fileName + " Created");
                 gson.toJson(toPrint, fw);

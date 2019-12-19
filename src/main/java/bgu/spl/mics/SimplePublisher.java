@@ -23,7 +23,7 @@ public final class SimplePublisher {
      *         			subscriber processing this event.
      * 	       			null in case no Subscriber has subscribed to {@code e.getClass()}.
      */
-    public final <T> Future<T> sendEvent(Event<T> e) {
+    public final <T> Future<T> sendEvent(Event<T> e)   {
         return mb.sendEvent(e);
     }
 
@@ -33,7 +33,7 @@ public final class SimplePublisher {
      * <p>
      * @param b The broadcast message to send
      */
-    public final void sendBroadcast(Broadcast b) {
+    public final void sendBroadcast(Broadcast b)  {
         mb.sendBroadcast(b);
     }
 }

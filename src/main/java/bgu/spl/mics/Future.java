@@ -1,7 +1,4 @@
 package bgu.spl.mics;
-
-import java.sql.Time;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -87,7 +84,7 @@ public class Future<T> {
 				try {
 					wait(timeoutinMil);
 				} catch (InterruptedException e) {
-					logM.log.severe("InterruptedException");
+					logM.log.severe("InterruptedException 1");
 				}
 				if (isDone()) {
 					return result;
