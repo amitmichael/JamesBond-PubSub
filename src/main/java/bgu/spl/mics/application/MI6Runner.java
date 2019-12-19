@@ -1,17 +1,16 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.*;
-import bgu.spl.mics.Future;
+import bgu.spl.mics.JsonParser;
+import bgu.spl.mics.LogManager;
+import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Inventory;
-import bgu.spl.mics.application.passiveObjects.Squad;
 import bgu.spl.mics.application.publishers.TimeService;
-import bgu.spl.mics.application.subscribers.M;
-import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.application.subscribers.Q;
-import bgu.spl.mics.json.Intelligence;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
@@ -20,87 +19,96 @@ import static java.lang.Thread.sleep;
  * In the end, you should output serialized objects.
  */
 public class MI6Runner {
+    private static long start = System.currentTimeMillis();
+    private static List<Thread> threads = new LinkedList<>();
+    private  static LogManager logM = LogManager.getInstance();
+
+
     public static void main(String[] args) throws InterruptedException {
-        LogManager logM = LogManager.getInstance();
-        if (args.length == 0) {
-            logM.log.severe("Enter input json path in program arguments");
+        logM.log.info("Program starts " + start);
+        if (args.length < 3) {
+            logM.log.severe("Enter input&Output json path in program arguments");
         } else {
-            //parse the json
-
-            JsonParser js = new JsonParser(args[0]);
-            List<List<?>> services = js.parseJson();
-
-            ExecutorService executorSingeltons = Executors.newFixedThreadPool(1);
-            executorSingeltons.execute(Q.getInstance());;
+            load(args[0]);
 
 
-            if (services.size() < 4)
-                logM.log.severe("json did not parse all 4 type of services");
-            else {
-
-                // run the executors
-                //M
-                ExecutorService executorM = Executors.newFixedThreadPool(services.get(0).size());
-                Iterator itm = services.get(0).iterator(); //iterator on M services
-                logM.log.info("Executing " + services.get(0).size() + " M services");
-                while (itm.hasNext()) {
-                    executorM.execute((Subscriber) itm.next());
+            for (Thread tt : threads) {
+                tt.start();
+            }
+            for (Thread tt : threads) {
+                try {
+                    tt.join();
+                } catch (InterruptedException e) {
                 }
-                executorM.shutdown();
-
-                //MP
-                ExecutorService executorMP = Executors.newFixedThreadPool(services.get(1).size());
-                Iterator itmp = services.get(1).iterator(); //iterator on MoneyPenny services
-                logM.log.info("Executing " + services.get(1).size() + " MoneyPenny services");
-                while (itmp.hasNext()) {
-                    executorMP.execute((Subscriber) itmp.next());
-                }
-                executorMP.shutdown();
+            }
+            Inventory.getInstance().printToFile(args[1]);
+            Diary.getInstance().printToFile(args[2]);
 
 
-                //Int
-                ExecutorService executorInt = Executors.newFixedThreadPool(services.get(2).size());
-                Iterator itint = services.get(2).iterator(); //iterator on Intelligence services
-                logM.log.info("Executing " + services.get(2).size() + " Intelligence services");
+            long end = System.currentTimeMillis();
+            logM.log.info("Program end " + end);
+            logM.log.info("Program duration " + Math.subtractExact(end, start));
 
-                while (itint.hasNext()) {
-                    executorInt.execute((Subscriber) itint.next());
-                }
-                executorInt.shutdown();
+        }
+    }
 
-                sleep(100); //wait to all services finish initialization
-                //TimeService
-                ExecutorService executorTimeService = Executors.newFixedThreadPool(services.get(3).size());
-                logM.log.info("Executing " + services.get(3).size() + " executorTime services");
-                executorTimeService.execute((Publisher) services.get(3).get(0));
-                executorTimeService.shutdown();
+    private static void load(String s) throws InterruptedException {
+        //parse the json
+        JsonParser js = new JsonParser(s);
+        List<List<?>> services = js.parseJson();
+        Thread t = new Thread(Q.getInstance());
+        t.setName("Q");
+        threads.add(t);
+        if (services.size() < 4)
+            logM.log.severe("json did not parse all 4 type of services");
+        else {
+
+            //M
+            Iterator itm = services.get(0).iterator(); //iterator on M services
+            logM.log.info("Adding " + services.get(0).size() + " M services");
+            while (itm.hasNext()) {
+                Subscriber curr = (Subscriber) itm.next();
+                Thread t1 = new Thread(curr);
+                t1.setName(curr.getName());
+                threads.add(t1);
+            }
+
+            //MP
+            Iterator itmp = services.get(1).iterator(); //iterator on MoneyPenny services
+            logM.log.info("Adding " + services.get(1).size() + " MoneyPenny services");
+            while (itmp.hasNext()) {
+                Subscriber curr = (Subscriber) itmp.next();
+                Thread t1 = new Thread(curr);
+                t1.setName(curr.getName());
+                threads.add(t1);
 
             }
 
+            //Int
+            Iterator itint = services.get(2).iterator(); //iterator on Intelligence services
+            logM.log.info("Adding " + services.get(2).size() + " Intelligence services");
 
-/*
-            Moneypenny mp1 = new Moneypenny("1");
-            Moneypenny mp2 = new Moneypenny("2");
-            Thread t2 = new Thread(mp1);
-            Thread t3 = new Thread(mp2);
-            M m2 = new M("M2");
-            List<String> l1 = new LinkedList<>();
-            l1.add("006");
-            t2.setName("MP1");
-            t3.setName("MP2");
-            t2.start();
-            t3.start();
-            AgentsAvailableEvent event1 = new AgentsAvailableEvent("",l1);
-            AgentsAvailableEvent event2 = new AgentsAvailableEvent("",l1);
-            MessageBrokerImpl.getInstance().getResultMap().put(event1,new Future<>());
-            MessageBrokerImpl.getInstance().getResultMap().put(event2,new Future<>());
-            sleep(100);
+            while (itint.hasNext()) {
+                Subscriber curr = (Subscriber) itint.next();
+                Thread t1 = new Thread(curr);
+                t1.setName(curr.getName());
+                threads.add(t1);
 
-            m2.getSimplePublisher().sendEvent(event1);
-            m2.getSimplePublisher().sendEvent(event2);
-*/
+            }
+
+            sleep(100); //wait to all services finish initialization
+            //TimeService
+            logM.log.info("Adding " + services.get(3).size() + " executorTime services");
+            TimeService timeser = (TimeService) services.get(3).get(0);
+            timeser.setThreads(threads);
+            Thread t1 = new Thread(timeser);
+            t1.setName("TimeService");
+            threads.add(t1);
+
         }
+
     }
+
 }
 
 

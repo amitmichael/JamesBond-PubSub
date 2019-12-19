@@ -2,7 +2,6 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.JsonParser;
 import bgu.spl.mics.LogManager;
-import com.sun.org.apache.xalan.internal.res.XSLTErrorResources;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class Diary {
 		reports.add(reportToAdd);
 		logM.log.info("Report was added to diary");
 		sleep(50);
-		printToFile("diaryTest.json"); // TBD to delete
+		//printToFile("diaryTest.json"); // TBD to delete
 	}
 
 	/**
@@ -66,7 +65,7 @@ public class Diary {
 	 */
 	public void printToFile(String filename){
 		JsonParser json = new JsonParser(filename);
-		json.printTofile(reports);
+		json.printToFileDiary(this);
 	}
 
 	/**

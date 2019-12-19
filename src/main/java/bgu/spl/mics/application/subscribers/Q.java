@@ -1,10 +1,7 @@
 package bgu.spl.mics.application.subscribers;
-
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Inventory;
-import sun.font.TrueTypeFont;
 
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * Q is the only Subscriber\Publisher that has access to the {@link bgu.spl.mics.application.passiveObjects.Inventory}.
@@ -53,7 +50,7 @@ public class Q extends Subscriber {
 						logM.log.info("gadget "+ gad+ " is available");
 						MessageBrokerImpl.getInstance().complete(event,  ""+timeTick);
 					} else {
-						MessageBrokerImpl.getInstance().complete(event,"false");
+						MessageBrokerImpl.getInstance().complete(event,null);
 						logM.log.warning("Gadget " + gad+  " is not available");
 					}
 				}
@@ -74,7 +71,8 @@ public class Q extends Subscriber {
 				synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
-						timeTick = msg.getTime();
+						if (msg.getTime() > timeTick)
+							timeTick = msg.getTime();
 					} else {
 						logM.log.severe(getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
 					}

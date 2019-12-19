@@ -1,13 +1,10 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Inventory;
-
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 
 /**
  * The {@link MessageBrokerImpl class is the implementation of the MessageBroker interface.
@@ -16,17 +13,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MessageBrokerImpl implements MessageBroker {
 
-	private static class singletonHolder{ private static MessageBroker MessageBrokerInstance = new MessageBrokerImpl();}
-	private ConcurrentHashMap<Class, ConcurrentLinkedQueue<Subscriber>> topics; // will hold all topics in the broker
-	private ConcurrentHashMap<Subscriber, ConcurrentLinkedQueue<Message>> registered; //will hold all registered subscribers and their queues
-	private ConcurrentHashMap<Event,Future> resultMap;
+
+	private static class singletonHolder {
+		private static MessageBroker MessageBrokerInstance = new MessageBrokerImpl();
+	}
+
+	private HashMap<Class, LinkedBlockingQueue<Subscriber>> topics; // will hold all topics in the broker
+	private HashMap<Subscriber, LinkedBlockingQueue<Message>> registered; //will hold all registered subscribers and their queues
+	private HashMap<Event, Future> resultMap;
 	private LogManager logM = LogManager.getInstance();
 
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");
-		topics = new ConcurrentHashMap<Class, ConcurrentLinkedQueue<Subscriber>>();
-		registered = new ConcurrentHashMap<Subscriber, ConcurrentLinkedQueue<Message>>();
-		resultMap = new ConcurrentHashMap<Event,Future>();
+		topics = new HashMap<Class, LinkedBlockingQueue<Subscriber>>();
+		registered = new HashMap<Subscriber, LinkedBlockingQueue<Message>>();
+		resultMap = new HashMap<Event, Future>();
 	}
 
 	/**
@@ -37,10 +38,10 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public  <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
+	public <T> void subscribeEvent(Class<? extends Event<T>> type, Subscriber m) {
 		synchronized (topics) {
 			if (!topics.containsKey(type)) { // if topic does not exists
-				topics.put(type, new ConcurrentLinkedQueue<Subscriber>());
+				topics.put(type, new LinkedBlockingQueue<Subscriber>());
 			}
 			topics.get(type).add(m); // add the subscriber to topic list
 			logM.log.info("Subscriber " + m.getName() + " Subscribed to " + type);
@@ -51,7 +52,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void subscribeBroadcast(Class<? extends Broadcast> type, Subscriber m) {
 		synchronized (topics) {
 			if (!topics.containsKey(type)) { // if topic does not exists
-				topics.put(type, new ConcurrentLinkedQueue<Subscriber>());
+				topics.put(type, new LinkedBlockingQueue<Subscriber>());
 			}
 			topics.get(type).add(m); // add the subscriber to topic list
 		}
@@ -59,60 +60,69 @@ public class MessageBrokerImpl implements MessageBroker {
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		if (!resultMap.containsKey(e)){
+		if (!resultMap.containsKey(e)) {
 			logM.log.severe("Event is not in futur map");
-		}
-		else
+		} else
 			resultMap.get(e).resolve(result);
 
 	}
 
 	@Override
-	public synchronized void sendBroadcast(Broadcast b) {
+	public void sendBroadcast(Broadcast b)   {
+		Long start = System.currentTimeMillis();
+
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
 		if (!topics.containsKey(b.getClass())) {
-			topics.put(b.getClass(), new ConcurrentLinkedQueue());
+			topics.put(b.getClass(), new LinkedBlockingQueue());
 			logM.log.info("topic " + b.getClass() + " added");
 		}
 		if (topics.containsKey(b.getClass())) {
-			Queue<Subscriber> distributionList = topics.get(b.getClass());
+			LinkedBlockingQueue distributionList = topics.get(b.getClass());
 			if (!distributionList.isEmpty()) {
 				Iterator it = distributionList.iterator();
-
-				while (it.hasNext()) {
+				while (registered != null && it.hasNext()) {
 					Object curr = it.next();
 					Subscriber currsub = (Subscriber) curr;
-					registered.get(currsub).add(b); // add b to subscriber queue
-					logM.log.info("Broadcast msg added to " + currsub.getName() + " queue");
-					synchronized (currsub){
-					currsub.notify();
-				}}
+					if (registered.get(currsub) != null) {
+						try {
+							registered.get(currsub).put(b); // add b to subscriber queue
+							logM.log.info("%% "+ System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
+						} catch (InterruptedException ex) {
+							logM.log.severe("InterruptedException");
+						}
+					}
+				}
 			} else {
 				logM.log.warning("Distribution list is empty");
 			}
 		} else {
 			logM.log.severe("topic does not exists");
 		}
+		Long end = System.currentTimeMillis();
+		logM.log.info("sendBroadcast duration " + Math.subtractExact(end,start));
 	}
 
 
 	@Override
-	public synchronized  <T> Future<T> sendEvent(Event<T> e) {
+	public synchronized <T> Future<T> sendEvent(Event<T> e) {
 		logM.log.info("SendEvent started msg from type " + e.getClass());
 		Future fut = new Future();
-		resultMap.put(e,fut);
+		resultMap.put(e, fut);
 
-		if (!topics.containsKey(e.getClass())){
-			topics.put(e.getClass(), new ConcurrentLinkedQueue<Subscriber>() {
+		if (!topics.containsKey(e.getClass())) {
+			topics.put(e.getClass(), new LinkedBlockingQueue<Subscriber>() {
 			});
 		}
 		if (!topics.get(e.getClass()).isEmpty()) {
-			Subscriber curr = topics.get(e.getClass()).poll();
-			registered.get(curr).add(e); //add the msg to curr queue
-			topics.get(e.getClass()).add(curr); //add curr to the topic queue
-			synchronized (curr){
-				curr.notify();
+			try {
+				Subscriber curr = topics.get(e.getClass()).poll();
+				if (registered.get(curr)!=null) {
+					registered.get(curr).put(e); //add the msg to curr queue
+					topics.get(e.getClass()).put(curr); //add curr to the topic queue
+				}
+			} catch (InterruptedException ex) {
+				logM.log.severe("InterruptedException");
 			}
 		}
 		return fut;
@@ -122,7 +132,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	public void register(Subscriber m) {
 		if (registered.containsKey(m))
 			logM.log.warning("Attempt to register exists subscriber: " + m.getName());
-		registered.put(m, new ConcurrentLinkedQueue<>());
+		registered.put(m, new LinkedBlockingQueue<>());
 		logM.log.info("Subscriber " + m.getName() + " registered");
 
 	}
@@ -145,8 +155,10 @@ public class MessageBrokerImpl implements MessageBroker {
 			{
 				logM.log.info("Resolving msg to cancel from " + m.getName() + " Queue");
 				Iterator it1 = registered.get(m).iterator();
-				while (it1.hasNext()){
-					resultMap.get(it1.next()).resolve("Canceled");
+				while (resultMap!=null && it1.hasNext()){
+					Message curr = (Message) it1.next();
+					if (!(curr instanceof TickBroadcast))
+						resultMap.get(curr).resolve("Canceled");
 				}
 			}
 			registered.remove(m); // remove from registered map
@@ -156,17 +168,25 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 
 	@Override
-	public Message awaitMessage(Subscriber m) throws InterruptedException {
-			synchronized (m) {
-					while (registered.get(m).isEmpty()) {
-						logM.log.info(m.getName() + " waiting for msg");
-						m.wait();
-					}
-					return registered.get(m).poll();
-				}
-	}
+	public Message awaitMessage(Subscriber m)   {
+		logM.log.info(m.getName() + " waiting for msg");
+		if (registered.get(m)!=null) {
+			try {
+				return registered.get(m).take();
 
+			} catch (InterruptedException e) {
+				m.terminate();
+				logM.log.warning(m.getName() + " terminating");
+				return null;
+			}
+		}
+		else return null;
+
+	}
 }
+
+
+
 
 
 

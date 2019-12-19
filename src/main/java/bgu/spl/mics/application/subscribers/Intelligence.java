@@ -2,15 +2,9 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
-import jdk.nashorn.internal.codegen.CompilerConstants;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeoutException;
 
-import static java.lang.Thread.sleep;
 
 /**
  * A Publisher only.
@@ -42,7 +36,7 @@ public class Intelligence extends Subscriber {
 		subscribeToTickBroadCastEvent();
 	}
 
-	private void sendMissions(MissionInfo m)   {
+	private void sendMissions(MissionInfo m) throws InterruptedException {
 		getSimplePublisher().sendEvent(new MissionReceivedEvent("MRE",m));
 		logM.log.info("Time: " + timeTick + " Msg: Sending MRE for mission " + m.getMissionName() + " time issued: " + m.getTimeIssued());
 		missions.remove(m);
@@ -53,7 +47,7 @@ public class Intelligence extends Subscriber {
 	private void subscribeToTickBroadCastEvent(){
 		Callback tickCallBack = new Callback() {
 			@Override
-			public void call(Object c) {
+			public void call(Object c) throws InterruptedException {
 				synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;

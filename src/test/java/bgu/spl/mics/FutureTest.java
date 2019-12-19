@@ -21,12 +21,12 @@ public class FutureTest {
     }
 
     @Test
-    public void gettimeouttest(){
+    public void gettimeouttest() throws InterruptedException {
         assertNull(future.get(100, TimeUnit.MILLISECONDS));
     }
 
     @Test
-    public void gettimeouttest1(){
+    public void gettimeouttest1() throws InterruptedException {
         future.resolve("Done");
         assertNotEquals(null,(future.get(100, TimeUnit.MILLISECONDS)));
     }

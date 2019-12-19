@@ -1,8 +1,10 @@
 package bgu.spl.mics.application.subscribers;
+
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 import bgu.spl.mics.application.passiveObjects.Report;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,51 +43,94 @@ public class M extends Subscriber {
 	private void subscribeMissionRecievedEvent() {
 		Callback back = new Callback() {
 			@Override
-			public void call(Object c) throws InterruptedException {
+			public void call(Object c) {
+				Long start = System.currentTimeMillis();
+				logM.log.info("MissionRecieve Callback Start " + start);
 				if (c instanceof MissionReceivedEvent) {
 					MissionReceivedEvent event = (MissionReceivedEvent) c;
+					logM.log.info("Time: " + timeTick+ " " + getName() + " Handle mission "+ event.getInfo().getMissionName() + " time  issued " + event.getInfo().getTimeIssued() );
 					int timeExpired = event.getInfo().getTimeExpired();
 					Diary.getInstance().increment(); //increment the total
 
-					logM.log.info("new TimeExpired assigned");
+					logM.log.info(getName() +" Time: " + timeTick + " " + "new TimeExpired assigned");
 					GadgetAvailableEvent eventG = new GadgetAvailableEvent(event.getInfo().getGadget());
-					AgentsAvailableEvent eventA = new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers());
-					Future fut1 = getSimplePublisher().sendEvent(eventG);
-					logM.log.info("Subscriber " + getName() + " sending EventG");
-					Future fut2 = getSimplePublisher().sendEvent(eventA);
-					logM.log.info("Subscriber " + getName() + " sending EventA");
-					String result1 = (String) fut1.get((timeExpired-timeTick)*100, TimeUnit.MILLISECONDS);
-					String result2 = (String) fut2.get((timeExpired-timeTick)*100, TimeUnit.MILLISECONDS);
-					try {
-						if (!result1.equals("false") & result2.equals("true")) {
-							if (timeTick <= timeExpired) {
-								MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission());
-								Future fut3 = MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission(event.getInfo().getSerialAgentsNumbers(),event.getInfo().getDuration()));
-								logM.log.info("Subscriber " + getName() + " sending ExcuteMission");
-								addReport(event.getInfo(),fut3,fut1);
-							} else {
-								MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
-								//String result4=(String) fut4.get();
-								logM.log.warning("Subscriber " + getName() + " sending AbortMission due to time expired");
-							}
-						}
-						else {
-							MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
-							logM.log.warning("Subscriber " + getName() + " sending AbortMission due to missing condition");
-						}
-					}catch (NullPointerException e){logM.log.severe( "Time: "+ timeTick + " " + event.getInfo().getMissionName() + " futur1 " + (fut1==null) + " futuer2 " + (fut2==null));}
-					MessageBrokerImpl.getInstance().complete(event, "true");
+					AgentsAvailableEvent eventA = new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers(),(timeExpired-timeTick)*100);
 
+					///try to acquire the agent
+					Future fut2 = getSimplePublisher().sendEvent(eventA);
+					logM.log.info( getName()+" Time: " + timeTick + " " + "Subscriber " + getName() + " sending EventA");
+					try {
+						logM.log.info(getName() +": time left  to process: "+ event.getInfo().getMissionName()+ " : " + (timeExpired - timeTick) * 100);
+						String result2 = (String) fut2.get((timeExpired - timeTick) * 100, TimeUnit.MILLISECONDS);
+						System.out.println("" + timeTick + " " + result2);
+					///try to acquire the gadget
+						Future fut1=null;
+						String result1=null;
+					if (result2!=null) {
+						fut1 = getSimplePublisher().sendEvent(eventG);
+						logM.log.info(getName()+ " Time: " + timeTick + " " + "Subscriber " + getName() + " sending EventG");
+						result1 = (String) fut1.get((timeExpired - timeTick) * 100, TimeUnit.MILLISECONDS);
+					}
+						if (result1!=null){
+							int Qtime = Integer.parseInt(result1);
+							timeTick = Integer.parseInt(result1); // ?
+						}
+						executeOrAbort(event, fut1, result1, result2, timeExpired);
+					} catch (InterruptedException e) {	terminate();
+						logM.log.warning(getName()+ " terminating");}
 
 				} else {
-					logM.log.warning("call is not of type MissionReceivedEvent");
+					logM.log.warning(getName()+" Time: " + timeTick + " " + "call is not of type MissionReceivedEvent");
 
+				}
+				Long end = System.currentTimeMillis();
+				logM.log.info("MissionRecieve Callback End " + end);
+				logM.log.info("MissionRecieve Callback duration " + Math.subtractExact(end, start));
+			}
+
+			private void executeOrAbort(MissionReceivedEvent event, Future fut1, String s1, String s2, int timeExpired)  {
+
+				if (s1!=null & s2!=null) {
+					if (timeTick <= timeExpired) {
+						MessageBrokerImpl.getInstance().sendEvent(new ExecuteMission(event.getInfo().getSerialAgentsNumbers(), event.getInfo().getDuration()));
+						//Future fut3 = MessageBrokerImpl.getInstance().sendEvent(new ExecuteMission(event.getInfo().getSerialAgentsNumbers(), event.getInfo().getDuration()));
+						logM.log.info("Subscriber " + getName() + " sending ExecuteMission");
+						addReport(event.getInfo(), s2, fut1);
+					} else {
+						MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
+						logM.log.warning("Time: " + timeTick + " " + "Subscriber " + getName() + " sending AbortMission due to time expired");
+					}
+				} else {
+					MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
+					logM.log.warning("Time: " + timeTick + " " + "Subscriber " + getName() + " sending AbortMission due to missing condition: " + event.getInfo().getMissionName());
 				}
 			}
 
+			private void addReport(MissionInfo m, String s2, Future f1) {
+				try {
+					List<String> serials = m.getSerialAgentsNumbers();
+					Future names = getSimplePublisher().sendEvent(new GetAgentNamesEvent(serials));
+					int Qtime = Integer.parseInt((String) f1.get());
+					int MPinstance= 0;
+					try {
+						 MPinstance = Integer.parseInt(s2);
+					} catch (NumberFormatException e ){
+						logM.log.severe("NumberFormatException");
+					}
+					List<String> namesList = (List<String>) names.get();
+					Report report = new Report(m.getMissionName(), serialNumber, MPinstance, serials, namesList, m.getGadget(), m.getTimeIssued(), Qtime, timeTick);
+					logM.log.info("Time: " + timeTick + " " + "New report was created");
+					Diary.getInstance().addReport(report);
+				} catch (InterruptedException e) {
+					terminate();
+					logM.log.warning(getName()+ " terminating");
+				}
+			}
 		};
+
 		subscribeEvent(MissionReceivedEvent.class, back);
 	}
+
 
 	private void subscribeToTickBroadCastEvent() {
 		Callback tickCallBack = new Callback() {
@@ -94,9 +139,10 @@ public class M extends Subscriber {
 				synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
-						timeTick = msg.getTime();
+						if (msg.getTime() > timeTick)
+							timeTick = msg.getTime();
 					} else {
-						logM.log.severe(getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
+						logM.log.severe("Time: "+ timeTick + " " +getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
 					}
 				}
 			}
@@ -105,18 +151,7 @@ public class M extends Subscriber {
 
 
 	}
-	public int getSerialNumber(){
-		return serialNumber;
-	}
-	private void addReport(MissionInfo m,Future t3,Future f1) throws InterruptedException {
-		List<String> serials = m.getSerialAgentsNumbers();
-		Future names = getSimplePublisher().sendEvent(new GetAgentNamesEvent(serials));
-		int Qtime = Integer.parseInt((String) f1.get());
-		int MPinstance = Integer.parseInt((String) t3.get());
-		List<String> namesList = (List<String>) names.get();
-		Report report = new Report(m.getMissionName(),serialNumber,MPinstance,serials,namesList,m.getGadget(),m.getTimeIssued(),Qtime,timeTick);
-		logM.log.info("New report was created");
-		Diary.getInstance().addReport(report);
-	}
+
+
 }
 

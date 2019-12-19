@@ -1,7 +1,5 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import bgu.spl.mics.LogManager;
-
 import java.util.List;
 
 /**

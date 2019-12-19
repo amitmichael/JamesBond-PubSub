@@ -7,7 +7,7 @@ abstract class RunnableSubPub implements Runnable {
     /**
      * this method is called once when the event loop starts.
      */
-    protected abstract void initialize();
+    protected abstract void initialize()  ;
 
     /**
      * @param name the Publisher/Subscriber name (used mainly for debugging purposes -

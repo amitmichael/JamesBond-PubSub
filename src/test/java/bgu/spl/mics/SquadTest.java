@@ -62,7 +62,7 @@ public class SquadTest {
     }
 
     @Test
-    public void releaseAgentstest() throws TimeoutException, InterruptedException {
+    public void releaseAgentstest() throws  InterruptedException {
         List<String> listserial = new LinkedList<String>();
         listserial.add(ag1.getSerialNumber());
         sq.sendAgents(listserial, 100);
