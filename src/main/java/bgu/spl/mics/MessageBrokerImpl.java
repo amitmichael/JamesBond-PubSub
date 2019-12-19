@@ -159,8 +159,11 @@ public class MessageBrokerImpl implements MessageBroker {
 	public Message awaitMessage(Subscriber m) throws InterruptedException {
 			synchronized (m) {
 					while (registered.get(m).isEmpty()) {
-						logM.log.info(m.getName() + " waiting for msg");
-						m.wait();
+						try {
+							logM.log.info(m.getName() + " waiting for msg");
+							m.wait();
+						} catch (InterruptedException e){ m.terminate(); }
+
 					}
 					return registered.get(m).poll();
 				}
