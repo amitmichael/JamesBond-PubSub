@@ -59,7 +59,7 @@ public class M extends Subscriber {
 					try {
 						if (!result1.equals("false") & result2.equals("true")) {
 							if (timeTick <= timeExpired) {
-								MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission());
+								MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission(event.getInfo().getSerialAgentsNumbers(),event.getInfo().getDuration()));
 								Future fut3 = MessageBrokerImpl.getInstance().sendEvent(new ExcuteMission(event.getInfo().getSerialAgentsNumbers(),event.getInfo().getDuration()));
 								logM.log.info("Subscriber " + getName() + " sending ExcuteMission");
 								addReport(event.getInfo(),fut3,fut1);

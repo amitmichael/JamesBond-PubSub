@@ -54,7 +54,7 @@ public class Diary {
 		reports.add(reportToAdd);
 		logM.log.info("Report was added to diary");
 		sleep(50);
-		printToFile("diaryTest.json"); // TBD to delete
+		//printToFile("diaryTest.json"); // TBD to delete
 	}
 
 	/**
