@@ -1,5 +1,7 @@
-package bgu.spl.mics;
+package bgu.spl.mics.events;
 
+
+import bgu.spl.mics.Broadcast;
 
 public class TickBroadcast implements Broadcast {
     private int time;
@@ -12,6 +14,8 @@ public class TickBroadcast implements Broadcast {
     public int getTime(){
         return time;
     }
+
+    public void setTime(int t) {this.time = t;}
 
 
 }

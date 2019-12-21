@@ -7,7 +7,7 @@
     ],
     "services": {
         "M": 2,
-        "Moneypenny": 2,
+        "Moneypenny": 3,
         "intelligence": [
             {
                 "missions": [
@@ -52,12 +52,11 @@
                 "missions": [
                     {
                         "serialAgentsNumbers": [
-                            "007",
-                            "006"
+                            "007"
                         ],
                         "duration": 7,
                         "gadget": "Sky Hook",
-                        "missionName": "Thunderball",
+                        "missionName": "2Thunderball",
                         "timeExpired": 15,
                         "timeIssued": 3
                     }

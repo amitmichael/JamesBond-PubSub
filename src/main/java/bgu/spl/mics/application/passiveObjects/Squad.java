@@ -64,7 +64,7 @@ public class Squad {
 	 * simulates executing a mission by calling sleep.
 	 * @param time   milliseconds to sleep
 	 */
-	public  void sendAgents(List<String> serials, int time) throws InterruptedException {
+	public void sendAgents(List<String> serials, int time) throws InterruptedException {
 			logM.log.info("Sending agents to Mission");
 			sleep(time);
 			releaseAgents(serials);

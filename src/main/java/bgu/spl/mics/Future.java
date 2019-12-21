@@ -83,7 +83,8 @@ public class Future<T> {
 			if (isDone())
 				return result;
 			else {
-					wait(timeoutinMil);
+					if (timeoutinMil > 0)
+						wait(timeoutinMil);
 
 				if (isDone()) {
 					return result;

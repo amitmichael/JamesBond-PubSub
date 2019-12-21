@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.subscribers;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.events.GadgetAvailableEvent;
+import bgu.spl.mics.events.TickBroadcast;
 
 
 /**

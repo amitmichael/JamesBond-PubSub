@@ -2,7 +2,8 @@ package bgu.spl.mics.application.publishers;
 
 import bgu.spl.mics.LogManager;
 import bgu.spl.mics.Publisher;
-import bgu.spl.mics.TickBroadcast;
+import bgu.spl.mics.events.Termination;
+import bgu.spl.mics.events.TickBroadcast;
 
 import java.util.List;
 import java.util.Timer;
@@ -49,6 +50,7 @@ public class TimeService extends Publisher {
 					}
 					else {
 						timer.cancel();
+						getSimplePublisher().sendBroadcast(new Termination());
 						for (Thread t : threads){
 							t.interrupt();
 							logM.log.info("$$ Interrupt to thread " + t.getName());

@@ -35,7 +35,7 @@ public class JsonParser {
         else {
             ToFile print = new ToFile();
             print.setReports(d.getReports());
-            print.setTotal(d.getTotal());
+            print.setTotal((d.getTotal().get()));
             printTofile(print);
         }
 

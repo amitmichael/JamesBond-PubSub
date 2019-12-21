@@ -1,8 +1,14 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.events.Termination;
+import bgu.spl.mics.events.TickBroadcast;
+import javafx.util.Pair;
+
+import javax.swing.text.html.HTMLDocument;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -13,21 +19,20 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class MessageBrokerImpl implements MessageBroker {
 
-
 	private static class singletonHolder {
 		private static MessageBroker MessageBrokerInstance = new MessageBrokerImpl();
 	}
 
-	private HashMap<Class, LinkedBlockingQueue<Subscriber>> topics; // will hold all topics in the broker
+	private ConcurrentHashMap<Class, LinkedBlockingQueue<Subscriber>> topics; // will hold all topics in the broker
 	private HashMap<Subscriber, LinkedBlockingQueue<Message>> registered; //will hold all registered subscribers and their queues
-	private HashMap<Event, Future> resultMap;
+	private ConcurrentHashMap<Event, Future> resultMap;
 	private LogManager logM = LogManager.getInstance();
 
 	private MessageBrokerImpl() {
 		logM.log.info("MessageBroker constructor was called");
-		topics = new HashMap<Class, LinkedBlockingQueue<Subscriber>>();
+		topics = new ConcurrentHashMap<Class, LinkedBlockingQueue<Subscriber>>();
 		registered = new HashMap<Subscriber, LinkedBlockingQueue<Message>>();
-		resultMap = new HashMap<Event, Future>();
+		resultMap = new ConcurrentHashMap<Event, Future>();
 	}
 
 	/**
@@ -44,7 +49,7 @@ public class MessageBrokerImpl implements MessageBroker {
 				topics.put(type, new LinkedBlockingQueue<Subscriber>());
 			}
 			topics.get(type).add(m); // add the subscriber to topic list
-			logM.log.info("Subscriber " + m.getName() + " Subscribed to " + type);
+			logM.log.info("Subscriber " + m.getName() + " Subscribed to " + type +" Size " + topics.get(type).size());
 		}
 	}
 
@@ -61,7 +66,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 		if (!resultMap.containsKey(e)) {
-			logM.log.severe("Event is not in futur map");
+			logM.log.severe("Event is not in future map");
 		} else
 			resultMap.get(e).resolve(result);
 
@@ -73,68 +78,82 @@ public class MessageBrokerImpl implements MessageBroker {
 
 		// add this msg to the topic broadcast
 		// notify all subscribers of this topic that msg arrived
-		if (!topics.containsKey(b.getClass())) {
-			topics.put(b.getClass(), new LinkedBlockingQueue());
-			logM.log.info("topic " + b.getClass() + " added");
+		LinkedBlockingQueue distributionList=null;
+		synchronized (topics) {
+			if (!topics.containsKey(b.getClass())) {
+				topics.put(b.getClass(), new LinkedBlockingQueue());
+				logM.log.info("topic " + b.getClass() + " added");
+			}
+			distributionList = topics.get(b.getClass());
 		}
-		if (topics.containsKey(b.getClass())) {
-			LinkedBlockingQueue distributionList = topics.get(b.getClass());
-			if (!distributionList.isEmpty()) {
+		if (!distributionList.isEmpty()) {
 				Iterator it = distributionList.iterator();
 				while (registered != null && it.hasNext()) {
 					Object curr = it.next();
 					Subscriber currsub = (Subscriber) curr;
 					if (registered.get(currsub) != null) {
 						try {
-							registered.get(currsub).put(b); // add b to subscriber queue
-							logM.log.info("%% "+ System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
+							synchronized (registered.get(currsub)) {
+								if (b instanceof Termination) {
+									registered.get(currsub).clear(); // clean the queue so termination will be the next msg
+									registered.get(currsub).put(b); // add b to subscriber queue
+								}
+								if (b instanceof TickBroadcast) {
+									updateTick(currsub, (TickBroadcast) b);
+								}
+
+								logM.log.info("%% " + System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
+							}
 						} catch (InterruptedException ex) {
 							logM.log.severe("InterruptedException");
 						}
 					}
 				}
-			} else {
+			}
+		else {
 				logM.log.warning("Distribution list is empty");
 			}
-		} else {
-			logM.log.severe("topic does not exists");
-		}
 		Long end = System.currentTimeMillis();
 		logM.log.info("sendBroadcast duration " + Math.subtractExact(end,start));
 	}
 
 
 	@Override
-	public synchronized <T> Future<T> sendEvent(Event<T> e) {
+	public  <T> Future<T> sendEvent(Event<T> e) {
 		logM.log.info("SendEvent started msg from type " + e.getClass());
 		Future fut = new Future();
 		resultMap.put(e, fut);
 
-		if (!topics.containsKey(e.getClass())) {
-			topics.put(e.getClass(), new LinkedBlockingQueue<Subscriber>() {
-			});
-		}
-		if (!topics.get(e.getClass()).isEmpty()) {
-			try {
-				Subscriber curr = topics.get(e.getClass()).poll();
-				if (registered.get(curr)!=null) {
+		synchronized (topics) {
+			if (!topics.containsKey(e.getClass())) {
+				topics.put(e.getClass(), new LinkedBlockingQueue<Subscriber>() {
+				});
+				logM.log.info("Creating new topic: "+ e.getClass());
+			}
+			if (!topics.get(e.getClass()).isEmpty()) {
+				try {
+					Subscriber curr = topics.get(e.getClass()).poll();
+					logM.log.info(" removing " + curr.getName() + " from the round robin loop, size: " + topics.get(e.getClass()).size());
+					logM.log.info("adding msg from type " + e.getClass() + " to "+ curr.getName()+ " queue");
+						//	synchronized (registered.get(curr)) {
 					registered.get(curr).put(e); //add the msg to curr queue
 					topics.get(e.getClass()).put(curr); //add curr to the topic queue
+					logM.log.info(" adding " + curr.getName() + " back to the round robin loop, size: " + topics.get(e.getClass()).size());
+
+				} catch (InterruptedException ex) {
+					logM.log.severe("InterruptedException");
 				}
-			} catch (InterruptedException ex) {
-				logM.log.severe("InterruptedException");
 			}
+			return fut;
 		}
-		return fut;
 	}
 
 	@Override
-	public void register(Subscriber m) {
+	public synchronized void register(Subscriber m) {
 		if (registered.containsKey(m))
 			logM.log.warning("Attempt to register exists subscriber: " + m.getName());
 		registered.put(m, new LinkedBlockingQueue<>());
 		logM.log.info("Subscriber " + m.getName() + " registered");
-
 	}
 
 	@Override
@@ -144,32 +163,37 @@ public class MessageBrokerImpl implements MessageBroker {
 			logM.log.warning("Trying to unregister not registered subscriber: " + m.getName());
 		}
 		else {
-			Iterator it = topics.entrySet().iterator();
-				while (it.hasNext()){
-					HashMap.Entry pair = (HashMap.Entry)it.next();
+			synchronized (topics) {
+				Iterator it = topics.entrySet().iterator();
+				while (it.hasNext()) {
+					HashMap.Entry pair = (HashMap.Entry) it.next();
 					Queue q1 = (Queue) pair.getValue();
 					logM.log.info("remove " + m.getName() + " from " + pair.getKey().toString() + " topic");
 					q1.remove(m); //remove the subscriber from each topic queue
 				}
-			if (!registered.get(m).isEmpty())
-			{
-				logM.log.info("Resolving msg to cancel from " + m.getName() + " Queue");
-				Iterator it1 = registered.get(m).iterator();
-				while (resultMap!=null && it1.hasNext()){
-					Message curr = (Message) it1.next();
-					if (!(curr instanceof TickBroadcast))
-						resultMap.get(curr).resolve("Canceled");
-				}
 			}
-			registered.remove(m); // remove from registered map
-			logM.log.info("Subscriber " + m.getName()+ " Unregistered");
+				if (!registered.get(m).isEmpty()) {
+					synchronized (registered.get(m)) {
+						logM.log.info("Resolving msg to cancel from " + m.getName() + " Queue");
+						Iterator it1 = registered.get(m).iterator();
+						while (resultMap != null && it1.hasNext()) {
+							Message curr = (Message) it1.next();
+							if (!(curr instanceof TickBroadcast | curr instanceof Termination))
+								resultMap.get(curr).resolve("Canceled");
+						}
+					}
+					registered.remove(m); // remove from registered map
+					logM.log.info("Subscriber " + m.getName() + " Unregistered");
+				}
 		}
-
 	}
 
 	@Override
 	public Message awaitMessage(Subscriber m)   {
 		logM.log.info(m.getName() + " waiting for msg");
+		if (!registered.containsKey(m)) {
+			logM.log.warning("Waiting for msg for non registered subscriber " + m.getName());
+		}
 		if (registered.get(m)!=null) {
 			try {
 				return registered.get(m).take();
@@ -180,8 +204,28 @@ public class MessageBrokerImpl implements MessageBroker {
 				return null;
 			}
 		}
-		else return null;
+		else {
+			logM.log.warning("Msg queue of " + m.getName()+ " is null");
+			return null;
+		}
 
+	}
+	private void updateTick (Subscriber currsub , TickBroadcast b) throws InterruptedException {
+		int count =0;
+		Iterator itmsg = registered.get(currsub).iterator();
+		while (itmsg.hasNext()){
+			Message m = (Message) itmsg.next();
+			if (m instanceof TickBroadcast) {
+				TickBroadcast mm = (TickBroadcast) m;
+				 mm.setTime(b.getTime());
+				count ++;
+			}
+		}
+		if (count>0)
+			logM.log.info(currsub.getName()+  " :Clean Tick "+ count + " msg cleaned");
+		else {
+			registered.get(currsub).put(b); // add b to subscriber queue
+		}
 	}
 }
 

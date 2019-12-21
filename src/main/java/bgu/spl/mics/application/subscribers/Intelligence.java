@@ -2,6 +2,7 @@ package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
+import bgu.spl.mics.events.TickBroadcast;
 
 import java.util.List;
 
