@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.subscribers;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.events.GadgetAvailableEvent;
+import bgu.spl.mics.events.TickBroadcast;
 
 
 /**
@@ -48,7 +50,7 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						MessageBrokerImpl.getInstance().complete(event,  ""+timeTick);
+						MessageBrokerImpl.getInstance().complete(event, ""+timeTick);
 					} else {
 						MessageBrokerImpl.getInstance().complete(event,null);
 						logM.log.warning("Gadget " + gad+  " is not available");

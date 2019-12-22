@@ -5,6 +5,7 @@ import bgu.spl.mics.LogManager;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Thread.sleep;
 
@@ -20,7 +21,7 @@ public class Diary {
 	private static class singletonHolder{
 	private static Diary diaryInstance = new Diary();}
 	private List<Report> reports;
-	int total;
+	AtomicInteger total;
 	private LogManager logM = LogManager.getInstance();
 
 
@@ -30,7 +31,7 @@ public class Diary {
 
 	private Diary(){
 		reports = new LinkedList<Report>();
-		total=0;
+		total= new AtomicInteger(0);
 	}
 
 
@@ -49,11 +50,9 @@ public class Diary {
 	 * adds a report to the diary
 	 * @param reportToAdd - the report to add
 	 */
-	public void addReport(Report reportToAdd) throws InterruptedException {
+	public synchronized void addReport(Report reportToAdd)  {
 		reports.add(reportToAdd);
 		logM.log.info("Report was added to diary");
-		sleep(50);
-		//printToFile("diaryTest.json"); // TBD to delete
 	}
 
 	/**
@@ -72,11 +71,11 @@ public class Diary {
 	 * Gets the total number of received missions (executed / aborted) be all the M-instances.
 	 * @return the total number of received missions (executed / aborted) be all the M-instances.
 	 */
-	public int getTotal(){
+	public AtomicInteger getTotal(){
 		return total;
 	}
 
 	public void increment(){
-		total++;
+		total.incrementAndGet();
 	}
 }

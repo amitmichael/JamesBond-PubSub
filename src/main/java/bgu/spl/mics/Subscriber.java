@@ -1,7 +1,7 @@
 package bgu.spl.mics;
-
+import bgu.spl.mics.application.subscribers.Moneypenny;
+import bgu.spl.mics.events.Termination;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -107,6 +107,21 @@ public abstract class Subscriber extends RunnableSubPub {
         MessageBrokerImpl.getInstance().unregister(this);
     }
 
+    private void subscribeToBroadCastTermination(){
+        Callback back = new Callback() {
+            @Override
+            public void call(Object c) {
+                if (c instanceof Termination){
+                    logM.log.info( getName() + " Got termination msg - termination");
+                    terminate();
+                }
+                else
+                    logM.log.severe(getName() + " received Broadcastmsg not from Termination type, type was: " + c.getClass());
+            }
+        };
+        subscribeBroadcast(Termination.class,back);
+    }
+
     /**
      * The entry point of the Subscriber. TODO: you must complete this code
      * otherwise you will end up in an infinite loop.
@@ -115,6 +130,10 @@ public abstract class Subscriber extends RunnableSubPub {
     public final void run() {
 
             initialize();
+            if (this instanceof Moneypenny){
+            }
+            else
+                subscribeToBroadCastTermination();
 
         while (!terminated) {
             Message msg = null;
@@ -129,14 +148,10 @@ public abstract class Subscriber extends RunnableSubPub {
 
             if (msg!=null && callbackmap.containsKey(msg.getClass())) {
                 logM.log.info("callback was found, calling call");
-                //logM.log.severe(getName() + " %%%%Start%%%% " + System.currentTimeMillis() + " " + Thread.currentThread());
                 try {
                     callbackmap.get(msg.getClass()).call(msg);
                 } catch (TimeoutException | InterruptedException e) { terminate(); }
-                //CallManager cm = new CallManager(msg,callbackmap.get(msg.getClass()));
-                //Thread t = new Thread(cm);
-                //t.run();
-                //logM.log.severe(getName() + " %%%%end%%%% " + System.currentTimeMillis());
+
 
             }
             else {
@@ -147,5 +162,5 @@ public abstract class Subscriber extends RunnableSubPub {
             }
         }
     }
-
 }
+

@@ -16,11 +16,19 @@
                             "006",
                             "007"
                         ],
-                        "duration": 6,
+                        "duration": 3,
                         "gadget": "Sky Hook",
                         "missionName": "Thunderball",
-                        "timeExpired": 8,
+                        "timeExpired": 15,
                         "timeIssued": 3
+                    },
+                    {
+                        "serialAgentsNumbers": ["007"],
+                        "duration": 2,
+                        "gadget": "Dagger shoe",
+                        "missionName": "The proposal",
+                        "timeExpired": 15,
+                        "timeIssued": 4
                     }
                 ]
             },
@@ -33,13 +41,13 @@
                         "duration": 5,
                         "gadget": "X-ray glasses",
                         "missionName": "Liam Nisan Alive",
-                        "timeExpired": 12,
-                        "timeIssued": 4
+                        "timeExpired": 9,
+                        "timeIssued": 2
                     }
                 ]
             }
         ],
-        "time": 25
+        "time": 20
     },
     "squad": [
         {

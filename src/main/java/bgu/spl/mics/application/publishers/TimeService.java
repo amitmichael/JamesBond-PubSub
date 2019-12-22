@@ -2,7 +2,8 @@ package bgu.spl.mics.application.publishers;
 
 import bgu.spl.mics.LogManager;
 import bgu.spl.mics.Publisher;
-import bgu.spl.mics.TickBroadcast;
+import bgu.spl.mics.events.Termination;
+import bgu.spl.mics.events.TickBroadcast;
 
 import java.util.List;
 import java.util.Timer;
@@ -23,7 +24,6 @@ public class TimeService extends Publisher {
 	private Timer timer;
 	private TimerTask task;
 	private LogManager logM = LogManager.getInstance();
-	private List<Thread> threads;
 
 
 	/**
@@ -49,10 +49,7 @@ public class TimeService extends Publisher {
 					}
 					else {
 						timer.cancel();
-						for (Thread t : threads){
-							t.interrupt();
-							logM.log.info("$$ Interrupt to thread " + t.getName());
-						}
+						getSimplePublisher().sendBroadcast(new Termination());
 					}
 				long end = System.currentTimeMillis();
 				logM.log.info("TimeService Timetick duration " + Math.subtractExact(end,start));
@@ -61,9 +58,7 @@ public class TimeService extends Publisher {
 
 		};
 	}
-	public void setThreads(List<Thread> t){
-		this.threads = t;
-	}
+
 
 	@Override
 	protected void initialize() { // ???

@@ -100,7 +100,6 @@ public class MI6Runner {
             //TimeService
             logM.log.info("Adding " + services.get(3).size() + " executorTime services");
             TimeService timeser = (TimeService) services.get(3).get(0);
-            timeser.setThreads(threads);
             Thread t1 = new Thread(timeser);
             t1.setName("TimeService");
             threads.add(t1);

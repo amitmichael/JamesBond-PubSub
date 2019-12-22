@@ -1,13 +1,11 @@
 package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Squad;
-import com.sun.xml.internal.ws.policy.EffectiveAlternativeSelector;
+import bgu.spl.mics.events.*;
+import java.util.Map;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -32,34 +30,31 @@ public class Moneypenny extends Subscriber {
 	protected synchronized void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
-		if (serialNumber.equals("1")) { //first MP will handle only those events
-			subscribeToAbortMission();
-			subscribeToExcuteMission();
-			subscribedToGetAgentNamesEvent();
-		} else {
+
+		if (!serialNumber.equals("1")) { //first MP will not handle AgentsAvailableEvent
 			subscribeToAgentsAvailableEvent();
-			subscribeToAbortMission();
-			subscribeToExcuteMission();
-			subscribedToGetAgentNamesEvent();
 		}
+		subscribeToAbortMission();
+		subscribeToExcuteMission();
+		subscribedToGetAgentNamesEvent();
+		subscribeToBroadCastTermination();
 	}
 
 
 	private void subscribedToGetAgentNamesEvent() {
 		Callback back1 = new Callback() {
 			@Override
-			public void call(Object c)  {
-				if (c instanceof GetAgentNamesEvent) {
-					GetAgentNamesEvent event = (GetAgentNamesEvent) c;
-					MessageBrokerImpl.getInstance().complete(event, Squad.getInstance().getAgentsNames(event.getSerial()));
+			public void call(Object c) {
+					if (c instanceof GetAgentNamesEvent) {
+						GetAgentNamesEvent event = (GetAgentNamesEvent) c;
+						MessageBrokerImpl.getInstance().complete(event, Squad.getInstance().getAgentsNames(event.getSerial()));
 
-				} else {
-					logM.log.warning("call is not of type GetAgentNamesEvent");
-				}
+					} else {
+						logM.log.warning("call is not of type GetAgentNamesEvent");
+					}
 			}
 		};
 		subscribeEvent(GetAgentNamesEvent.class, back1);
-
 	}
 
 	private void subscribeToExcuteMission() {
@@ -83,26 +78,15 @@ public class Moneypenny extends Subscriber {
 
 	private void subscribeToAgentsAvailableEvent() {
 		Callback back = new Callback() {
-			private Boolean result = null;
-			private Boolean semiTerminate = false;
+
 			@Override
 			public void call(Object c)  {
+				boolean result;
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
 
 					logM.log.info("squad is trying to execute agents");
-					Timer timer = new Timer(true);
-					TimerTask  interrupt = new TimerTask() {
-						@Override
-						public void run() {
-							if (result==null) {
-								semiTerminate=true;
-								System.out.println("Timeout");
-								Thread.currentThread().interrupt();
-							}
-						}
-					};
-					timer.schedule(interrupt, 0,event.getTimeout());
+
 					try  {
 						result = squad.getAgents(event.getserials());
 						if (result == true) {
@@ -111,16 +95,9 @@ public class Moneypenny extends Subscriber {
 							MessageBrokerImpl.getInstance().complete(event, null);
 						}
 					} catch (InterruptedException e){
-						if (semiTerminate){
-							semiTerminate=false;
-							MessageBrokerImpl.getInstance().complete(event, null);
-						}
-						else {
-							terminate();
-							logM.log.warning(getName() + " terminating");
-						}
-						;}
-
+						System.out.println("getAgent got interrupt");
+						MessageBrokerImpl.getInstance().complete(event, null);
+					}
 				} else {
 					logM.log.warning("call is not of type AgentAvilableEvent");
 				}
@@ -151,6 +128,31 @@ public class Moneypenny extends Subscriber {
 	public String getSerialNumber(){
 		return serialNumber;
 	}
+
+	private void releaseAllAgents(){ //during termination
+		Map<String, Agent> all = Squad.getInstance().getAgents();
+		logM.log.info("@ Starting releasing all agents");
+		for (Agent a : all.values()){
+			a.release();
+		}
+	}
+
+	private void subscribeToBroadCastTermination(){
+		Callback back = new Callback() {
+			@Override
+			public void call(Object c) {
+				if (c instanceof Termination){
+					logM.log.info( getName() + " Got termination msg - termination");
+					releaseAllAgents();
+					terminate();
+				}
+				else
+					logM.log.severe(getName() + " received Broadcastmsg not from Termination type, type was: " + c.getClass());
+			}
+		};
+		subscribeBroadcast(Termination.class,back);
+	}
+
 }
 
 
