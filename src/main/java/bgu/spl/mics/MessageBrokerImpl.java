@@ -98,13 +98,11 @@ public class MessageBrokerImpl implements MessageBroker {
 							synchronized (registered.get(currsub)) {
 								if (b instanceof Termination) {
 									clearQueue(currsub);
-									//registered.get(currsub).clear(); // clean the queue so termination will be the next msg
-									registered.get(currsub).put(b); // add b to subscriber queue
 								}
-								if (b instanceof TickBroadcast) {
-									updateTick(currsub, (TickBroadcast) b);
-								}
-
+								registered.get(currsub).put(b); // add b to subscriber queue
+								//if (b instanceof TickBroadcast) {
+								//	updateTick(currsub, (TickBroadcast) b);
+								//}
 								logM.log.info("%% " + System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
 							}
 						} catch (InterruptedException ex) {
