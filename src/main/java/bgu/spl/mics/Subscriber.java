@@ -1,9 +1,7 @@
 package bgu.spl.mics;
-
+import bgu.spl.mics.application.subscribers.Moneypenny;
 import bgu.spl.mics.events.Termination;
-
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -108,6 +106,7 @@ public abstract class Subscriber extends RunnableSubPub {
         this.terminated = true;
         MessageBrokerImpl.getInstance().unregister(this);
     }
+
     private void subscribeToBroadCastTermination(){
         Callback back = new Callback() {
             @Override
@@ -131,7 +130,10 @@ public abstract class Subscriber extends RunnableSubPub {
     public final void run() {
 
             initialize();
-            subscribeToBroadCastTermination();
+            if (this instanceof Moneypenny){
+            }
+            else
+                subscribeToBroadCastTermination();
 
         while (!terminated) {
             Message msg = null;

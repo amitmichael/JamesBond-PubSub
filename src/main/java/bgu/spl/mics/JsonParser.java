@@ -38,7 +38,6 @@ public class JsonParser {
             print.setTotal((d.getTotal().get()));
             printTofile(print);
         }
-
     }
 
     public void printTofile(Object toPrint) {
@@ -132,7 +131,7 @@ public class JsonParser {
 
 
         } catch (FileNotFoundException e) {
-            logM.log.severe("File" + this.fileName + " not found");
+            logM.log.severe("File " + this.fileName + " not found");
         }
 
             return toReturn;

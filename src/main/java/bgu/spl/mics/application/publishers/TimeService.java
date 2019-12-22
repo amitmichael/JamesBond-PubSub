@@ -24,7 +24,6 @@ public class TimeService extends Publisher {
 	private Timer timer;
 	private TimerTask task;
 	private LogManager logM = LogManager.getInstance();
-	private List<Thread> threads;
 
 
 	/**
@@ -51,10 +50,6 @@ public class TimeService extends Publisher {
 					else {
 						timer.cancel();
 						getSimplePublisher().sendBroadcast(new Termination());
-						for (Thread t : threads){
-							t.interrupt();
-							logM.log.info("$$ Interrupt to thread " + t.getName());
-						}
 					}
 				long end = System.currentTimeMillis();
 				logM.log.info("TimeService Timetick duration " + Math.subtractExact(end,start));
@@ -63,9 +58,7 @@ public class TimeService extends Publisher {
 
 		};
 	}
-	public void setThreads(List<Thread> t){
-		this.threads = t;
-	}
+
 
 	@Override
 	protected void initialize() { // ???

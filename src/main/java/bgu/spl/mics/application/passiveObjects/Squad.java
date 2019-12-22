@@ -1,9 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
-
 import bgu.spl.mics.LogManager;
-
 import java.util.*;
-
 import static java.lang.Thread.sleep;
 
 /**
@@ -32,6 +29,9 @@ public class Squad {
 
 	public static Squad getInstance() {
 		return singletonHolder.squadInstance;
+	}
+	public Map<String, Agent> getAgents(){
+		return this.agents;
 	}
 
 	/**
@@ -106,5 +106,6 @@ public class Squad {
 		}
 	    return toReturn;
     }
+
 
 }

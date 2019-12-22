@@ -50,7 +50,7 @@ public class Q extends Subscriber {
 					String gad = event.getGadget();
 					if (inv.getItem(gad)) {
 						logM.log.info("gadget "+ gad+ " is available");
-						MessageBrokerImpl.getInstance().complete(event,  ""+timeTick);
+						MessageBrokerImpl.getInstance().complete(event, ""+timeTick);
 					} else {
 						MessageBrokerImpl.getInstance().complete(event,null);
 						logM.log.warning("Gadget " + gad+  " is not available");

@@ -1,5 +1,5 @@
 {
-    "inventory": [ 
+    "inventory": [
         "Sky Hook",
         "Geiger counter",
         "X-ray glasses",
@@ -7,7 +7,7 @@
     ],
     "services": {
         "M": 2,
-        "Moneypenny": 3,
+        "Moneypenny": 2,
         "intelligence": [
             {
                 "missions": [
@@ -52,11 +52,12 @@
                 "missions": [
                     {
                         "serialAgentsNumbers": [
-                            "007"
+                            "007",
+                            "006"
                         ],
                         "duration": 7,
                         "gadget": "Sky Hook",
-                        "missionName": "2Thunderball",
+                        "missionName": "Thunderball",
                         "timeExpired": 15,
                         "timeIssued": 3
                     }

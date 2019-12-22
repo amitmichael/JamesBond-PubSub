@@ -1,12 +1,10 @@
 package bgu.spl.mics.application.subscribers;
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Squad;
-import bgu.spl.mics.events.AbortMission;
-import bgu.spl.mics.events.AgentsAvailableEvent;
-import bgu.spl.mics.events.ExecuteMission;
-import bgu.spl.mics.events.GetAgentNamesEvent;
-
+import bgu.spl.mics.events.*;
+import java.util.Map;
 
 
 
@@ -32,12 +30,14 @@ public class Moneypenny extends Subscriber {
 	protected synchronized void initialize() {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
+
 		if (!serialNumber.equals("1")) { //first MP will not handle AgentsAvailableEvent
 			subscribeToAgentsAvailableEvent();
 		}
 		subscribeToAbortMission();
 		subscribeToExcuteMission();
 		subscribedToGetAgentNamesEvent();
+		subscribeToBroadCastTermination();
 	}
 
 
@@ -95,9 +95,9 @@ public class Moneypenny extends Subscriber {
 							MessageBrokerImpl.getInstance().complete(event, null);
 						}
 					} catch (InterruptedException e){
-							System.out.println("getAgent got interrupt");
-							MessageBrokerImpl.getInstance().complete(event, null);
-						}
+						System.out.println("getAgent got interrupt");
+						MessageBrokerImpl.getInstance().complete(event, null);
+					}
 				} else {
 					logM.log.warning("call is not of type AgentAvilableEvent");
 				}
@@ -128,6 +128,31 @@ public class Moneypenny extends Subscriber {
 	public String getSerialNumber(){
 		return serialNumber;
 	}
+
+	private void releaseAllAgents(){ //during termination
+		Map<String, Agent> all = Squad.getInstance().getAgents();
+		logM.log.info("@ Starting releasing all agents");
+		for (Agent a : all.values()){
+			a.release();
+		}
+	}
+
+	private void subscribeToBroadCastTermination(){
+		Callback back = new Callback() {
+			@Override
+			public void call(Object c) {
+				if (c instanceof Termination){
+					logM.log.info( getName() + " Got termination msg - termination");
+					releaseAllAgents();
+					terminate();
+				}
+				else
+					logM.log.severe(getName() + " received Broadcastmsg not from Termination type, type was: " + c.getClass());
+			}
+		};
+		subscribeBroadcast(Termination.class,back);
+	}
+
 }
 
 

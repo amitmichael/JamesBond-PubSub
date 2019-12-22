@@ -1,5 +1,7 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.events.ExecuteMission;
+import bgu.spl.mics.events.GetAgentNamesEvent;
 import bgu.spl.mics.events.Termination;
 import bgu.spl.mics.events.TickBroadcast;
 import javafx.util.Pair;
@@ -95,7 +97,8 @@ public class MessageBrokerImpl implements MessageBroker {
 						try {
 							synchronized (registered.get(currsub)) {
 								if (b instanceof Termination) {
-									registered.get(currsub).clear(); // clean the queue so termination will be the next msg
+									clearQueue(currsub);
+									//registered.get(currsub).clear(); // clean the queue so termination will be the next msg
 									registered.get(currsub).put(b); // add b to subscriber queue
 								}
 								if (b instanceof TickBroadcast) {
@@ -178,8 +181,6 @@ public class MessageBrokerImpl implements MessageBroker {
 						Iterator it1 = registered.get(m).iterator();
 						while (resultMap != null && it1.hasNext()) {
 							Message curr = (Message) it1.next();
-							if (!(curr instanceof TickBroadcast | curr instanceof Termination))
-								resultMap.get(curr).resolve("Canceled");
 						}
 					}
 					registered.remove(m); // remove from registered map
@@ -225,6 +226,13 @@ public class MessageBrokerImpl implements MessageBroker {
 			logM.log.info(currsub.getName()+  " :Clean Tick "+ count + " msg cleaned");
 		else {
 			registered.get(currsub).put(b); // add b to subscriber queue
+		}
+	}
+	private void clearQueue(Subscriber currsub){
+		for (Message m : registered.get(currsub)){
+			if (!(m instanceof ExecuteMission | m instanceof GetAgentNamesEvent| m instanceof MissionReceivedEvent )){
+				registered.get(currsub).remove(m);
+			}
 		}
 	}
 }

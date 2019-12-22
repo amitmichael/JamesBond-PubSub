@@ -46,12 +46,12 @@ public class M extends Subscriber {
 			@Override
 			public void call(Object c) {
 				Long start = System.currentTimeMillis();
+				Diary.getInstance().increment(); //increment the total
 				logM.log.info("MissionRecieve Callback Start " + start);
 				if (c instanceof MissionReceivedEvent) {
 					MissionReceivedEvent event = (MissionReceivedEvent) c;
 					logM.log.info("Time: " + timeTick + " " + getName() + " Handle mission " + event.getInfo().getMissionName() + " time  issued " + event.getInfo().getTimeIssued());
 					int timeExpired = event.getInfo().getTimeExpired();
-					Diary.getInstance().increment(); //increment the total
 
 					logM.log.info(getName() + " Time: " + timeTick + " " + "new TimeExpired assigned");
 
@@ -74,11 +74,14 @@ public class M extends Subscriber {
 							}
 							//////////////////execute mission///////////////////////////
 							if (resultGadget != null) {
-								int Qtime = Integer.parseInt(resultGadget);
+								int Qtime;
+								try {
+									 Qtime = Integer.parseInt(resultGadget);
+								} catch (NumberFormatException e){Qtime = timeExpired+1;}
 								if (Qtime <= timeExpired) {
+									addReport(event.getInfo(), resultAgent, Qtime);
 									MessageBrokerImpl.getInstance().sendEvent(new ExecuteMission(event.getInfo().getSerialAgentsNumbers(), event.getInfo().getDuration()));
 									logM.log.info("Subscriber " + getName() + " sending ExecuteMission");
-									addReport(event.getInfo(), resultAgent, Qtime);
 								} else { /////////////////Abort///////////////////////////////
 									MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
 									logM.log.warning("Time: " + timeTick + " " + "Subscriber " + getName() + " sending AbortMission due to time expired");
