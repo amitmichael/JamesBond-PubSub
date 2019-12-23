@@ -56,12 +56,11 @@ public class JsonParser {
 
         }
     }
-    public List<List<?>>  parseJson() {
+    public List<List<?>>  parseJson() throws FileNotFoundException {
 
         LinkedList<List<?>> toReturn = new LinkedList();
 
 
-        try {
             logM.log.info("Starting parsing json");
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(this.fileName));
@@ -130,9 +129,6 @@ public class JsonParser {
             logM.log.info("Json parse finished successfully ");
 
 
-        } catch (FileNotFoundException e) {
-            logM.log.severe("File " + this.fileName + " not found");
-        }
 
             return toReturn;
     }

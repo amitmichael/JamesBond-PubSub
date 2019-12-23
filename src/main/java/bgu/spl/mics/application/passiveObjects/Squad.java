@@ -15,6 +15,7 @@ public class Squad {
 	private static class singletonHolder{
 	private static Squad squadInstance = new Squad();}
 	private LogManager logM = LogManager.getInstance();
+	private Object agentLock = new Object();
 
 
 	/**
@@ -54,7 +55,7 @@ public class Squad {
 	 * Releases agents.
 	 */
 	public void releaseAgents(List<String> serials) {
-		synchronized (agents) {
+
 			logM.log.info("&& releaseAgents Start");
 			Iterator iter = serials.iterator();
 			while (iter.hasNext()) {
@@ -63,8 +64,8 @@ public class Squad {
 					curr.release();
 			}
 			logM.log.info("&& releaseAgents end");
-		}
 	}
+
 
 
 	/**
@@ -84,18 +85,29 @@ public class Squad {
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
 	public boolean getAgents(List<String> serials) throws InterruptedException {
-				Iterator iter = serials.iterator();
-				while (iter.hasNext()) {
-					String tmp = (String) iter.next();
-					Agent next = agents.get(tmp);
-					if (next == null) { // agent is not in the squad
-						logM.log.severe("agent " + tmp + " is not in the squad");
-						return false;
-					} else
-						next.acquire();
+		synchronized (agentLock) {
+			List<Agent> agentsList = new LinkedList<>();
+			Iterator iter = serials.iterator();
+			while (iter.hasNext()) {
+				String tmp = (String) iter.next();
+				Agent next = agents.get(tmp);
+				if (next == null) { // agent is not in the squad
+					logM.log.severe("agent " + tmp + " is not in the squad");
+					return false;
+				} else {
+					agentsList.add(next);
 				}
-				return true;
 			}
+
+			for (Agent a : agentsList) {
+				a.acquire();
+			}
+
+			return true;
+		}
+	}
+
+
 
     /**
      * gets the agents names

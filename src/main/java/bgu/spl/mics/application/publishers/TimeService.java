@@ -37,37 +37,36 @@ public class TimeService extends Publisher {
 		super("TimeService");
 		this.termination = duration;
 		this.count = 1;
-		timer = new Timer();
-		task = new TimerTask() {
-			@Override
-			public synchronized void run() {
-				long start = System.currentTimeMillis();
-					if (count <= termination) {
-
-						TickBroadcast toSend = new TickBroadcast(count);
-						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
-							getSimplePublisher().sendBroadcast(toSend);
-						count++;
-					}
-					else {
-						timer.cancel();
-
-						logM.log.info("Sending release all agents msg ");
-						getSimplePublisher().sendEvent(new ReleaseAllAgents());
-						getSimplePublisher().sendBroadcast(new Termination());
-					}
-				long end = System.currentTimeMillis();
-				logM.log.info("TimeService Timetick duration " + Math.subtractExact(end,start));
-				}
-
-
-		};
 	}
 
 
 	@Override
 	protected void initialize() { // ???
-		// TODO Implement this
+		timer = new Timer();
+		task = new TimerTask() {
+			@Override
+			public synchronized void run() {
+				long start = System.currentTimeMillis();
+				if (count <= termination) {
+
+					TickBroadcast toSend = new TickBroadcast(count);
+					logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
+					getSimplePublisher().sendBroadcast(toSend);
+					count++;
+				}
+				else {
+					timer.cancel();
+
+					logM.log.info("Sending release all agents msg ");
+					getSimplePublisher().sendEvent(new ReleaseAllAgents());
+					getSimplePublisher().sendBroadcast(new Termination());
+				}
+				long end = System.currentTimeMillis();
+				logM.log.info("TimeService Timetick duration " + Math.subtractExact(end,start));
+			}
+
+
+		};
 	}
 
 	@Override

@@ -14,11 +14,6 @@ public class FutureTest {
         future = new Future<String>();
     }
 
-    @Test
-    public void gettest() throws InterruptedException {
-       // String result = future.get();
-       // assertEquals(null,result);
-    }
 
     @Test
     public void gettimeouttest() throws InterruptedException {
@@ -39,16 +34,7 @@ public class FutureTest {
     @Test
     public void resolvetest() throws InterruptedException {
         future.resolve("Done");
-        //String result = future.get();
-        //assertNotEquals(null,result);
-        //assertEquals("Done",result);
-    }
-
-    @Test
-    public void isDonetest2() throws InterruptedException {
-        resolvetest();
-        future.resolve("Done");
-        assertTrue(future.isDone());
+        assertEquals("Done",future.get());
     }
 
 

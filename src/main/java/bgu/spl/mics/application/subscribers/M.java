@@ -57,13 +57,11 @@ public class M extends Subscriber {
 
 					/////////////try to acquire the agent////////////////////
 					if (timeTick<timeExpired) {
-						Future futAgent = getSimplePublisher().sendEvent(new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers()));
+						Future futAgent = getSimplePublisher().sendEvent(new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers(),(timeExpired-timeTick)*100));
 						logM.log.info(getName() + " Time: " + timeTick + " " + "Subscriber " + getName() + " sending EventA");
 						try {
 							logM.log.info(getName() + ": time left  to process: " + event.getInfo().getMissionName() + " : " + (timeExpired - timeTick) * 100);
 							String resultAgent = (String) futAgent.get((timeExpired - timeTick) * 100, TimeUnit.MILLISECONDS);
-							//String resultAgent = (String) futAgent.get();
-							System.out.println("" + timeTick + " " + resultAgent);
 
 							/////////////try to acquire the gadget//////////////////
 							Future futGadget = null;

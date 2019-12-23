@@ -5,8 +5,8 @@
         "Dagger shoe"
     ],
     "services": {
-        "M": 3,
-        "Moneypenny": 4,
+        "M": 2,
+        "Moneypenny": 3,
         "intelligence": [
             {
                 "missions": [
@@ -17,7 +17,7 @@
                         ],
                         "duration": 3,
                         "gadget": "Sky Hook",
-                        "missionName": "Thunderball",
+                        "name": "Thunderball",
                         "timeExpired": 15,
                         "timeIssued": 3
                     },
@@ -25,7 +25,7 @@
                         "serialAgentsNumbers": ["008"],
                         "duration": 2,
                         "gadget": "Dagger shoe",
-                        "missionName": "GoldFinger",
+                        "name": "GoldFinger",
                         "timeExpired": 18,
                         "timeIssued": 10
                     }
@@ -40,7 +40,7 @@
                         ],
                         "duration": 3,
                         "gadget": "X-ray glasses",
-                        "missionName": "The World Is Not Enough",
+                        "name": "The World Is Not Enough",
                         "timeExpired": 15,
                         "timeIssued": 3
                     },
@@ -48,7 +48,7 @@
                         "serialAgentsNumbers": ["007"],
                         "duration": 2,
                         "gadget": "X-ray glasses",
-                        "missionName": "From Russia With Love",
+                        "name": "From Russia With Love",
                         "timeExpired": 100,
                         "timeIssued": 10
                     }

@@ -97,9 +97,6 @@ public class MessageBrokerImpl implements MessageBroker {
 									clearQueue(currsub);
 								}
 								registered.get(currsub).put(b); // add b to subscriber queue
-								//if (b instanceof TickBroadcast) {
-								//	updateTick(currsub, (TickBroadcast) b);
-								//}
 								logM.log.info("%% " + System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
 							}
 						} catch (InterruptedException ex) {
@@ -133,7 +130,6 @@ public class MessageBrokerImpl implements MessageBroker {
 					Subscriber curr = topics.get(e.getClass()).poll();
 					logM.log.info(" removing " + curr.getName() + " from the round robin loop, size: " + topics.get(e.getClass()).size());
 					logM.log.info("adding msg from type " + e.getClass() + " to "+ curr.getName()+ " queue");
-						//	synchronized (registered.get(curr)) {
 					registered.get(curr).put(e); //add the msg to curr queue
 					topics.get(e.getClass()).put(curr); //add curr to the topic queue
 					logM.log.info(" adding " + curr.getName() + " back to the round robin loop, size: " + topics.get(e.getClass()).size());

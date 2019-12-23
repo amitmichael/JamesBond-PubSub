@@ -8,6 +8,7 @@ import bgu.spl.mics.application.passiveObjects.Inventory;
 import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.Q;
 
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +56,16 @@ public class MI6Runner {
     private static void load(String s) throws InterruptedException {
         //parse the json
         JsonParser js = new JsonParser(s);
-        List<List<?>> services = js.parseJson();
+        List<List<?>> services = null;
+        try {
+            services = js.parseJson();
+        } catch (FileNotFoundException e ){
+
+            logM.log.severe("File " + s + " not found");
+            System.out.println("File " + s + " not found");
+            return;
+
+        }
         Thread t = new Thread(Q.getInstance());
         t.setName("Q");
         threads.add(t);

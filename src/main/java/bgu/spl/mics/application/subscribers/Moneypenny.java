@@ -31,7 +31,7 @@ public class Moneypenny extends Subscriber {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
 
-		if (serialNumber.equals("1")){
+		if (Integer.parseInt(serialNumber)%2==0){ // even
 			subscribeToAbortMission();
 			subscribeToExcuteMission();
 			subscribedToGetAgentNamesEvent();
@@ -98,7 +98,6 @@ public class Moneypenny extends Subscriber {
 							MessageBrokerImpl.getInstance().complete(event, null);
 						}
 					} catch (InterruptedException e){
-						System.out.println("getAgent got interrupt");
 						MessageBrokerImpl.getInstance().complete(event, null);
 					}
 				} else {
