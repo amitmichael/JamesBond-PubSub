@@ -22,7 +22,7 @@ public class MissionInfo {
 
 
 	public MissionInfo(Mission m){
-		missionName = m.getMissionName();
+		missionName = m.getname();
 		gadget = m.getGadget();
 		serialAgentsNumbers = m.getSerialAgentsNumbers();
 		timeIssued = m.getTimeIssued();

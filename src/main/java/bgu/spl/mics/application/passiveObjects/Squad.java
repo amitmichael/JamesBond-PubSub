@@ -15,6 +15,7 @@ public class Squad {
 	private static class singletonHolder{
 	private static Squad squadInstance = new Squad();}
 	private LogManager logM = LogManager.getInstance();
+	private Object agentLock = new Object();
 
 
 	/**
@@ -53,20 +54,28 @@ public class Squad {
 	/**
 	 * Releases agents.
 	 */
-	public void releaseAgents(List<String> serials){
-		Iterator iter=serials.iterator();
-		while (iter.hasNext()){
-			agents.get(iter.next()).release();
-		}
+	public void releaseAgents(List<String> serials) {
+
+			logM.log.info("&& releaseAgents Start");
+			Iterator iter = serials.iterator();
+			while (iter.hasNext()) {
+				Agent curr =  agents.get(iter.next());
+				if (curr!=null)
+					curr.release();
+			}
+			logM.log.info("&& releaseAgents end");
 	}
+
+
 
 	/**
 	 * simulates executing a mission by calling sleep.
 	 * @param time   milliseconds to sleep
 	 */
 	public void sendAgents(List<String> serials, int time) throws InterruptedException {
-			logM.log.info("Sending agents to Mission");
+			logM.log.info("&& Sending agents to Mission for time: "+ time +" current time : "+ System.currentTimeMillis());
 			sleep(time);
+			logM.log.info("&& Mission completed current time : "+ System.currentTimeMillis());
 			releaseAgents(serials);
 	}
 
@@ -75,20 +84,30 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public synchronized boolean getAgents(List<String> serials) throws InterruptedException {
-		Iterator iter=serials.iterator();
-		while (iter.hasNext()){
-			String tmp = (String) iter.next();
-			Agent next=agents.get(tmp);
-			if (next==null){ // agent is not in the squad
-				logM.log.severe("agent " + tmp+ " is not in the squad");
-				return false;
+	public boolean getAgents(List<String> serials) throws InterruptedException {
+		synchronized (agentLock) {
+			List<Agent> agentsList = new LinkedList<>();
+			Iterator iter = serials.iterator();
+			while (iter.hasNext()) {
+				String tmp = (String) iter.next();
+				Agent next = agents.get(tmp);
+				if (next == null) { // agent is not in the squad
+					logM.log.severe("agent " + tmp + " is not in the squad");
+					return false;
+				} else {
+					agentsList.add(next);
+				}
 			}
-			else
-				next.acquire();
+
+			for (Agent a : agentsList) {
+				a.acquire();
+			}
+
+			return true;
 		}
-		return true;
 	}
+
+
 
     /**
      * gets the agents names

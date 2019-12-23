@@ -1,9 +1,6 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.events.ExecuteMission;
-import bgu.spl.mics.events.GetAgentNamesEvent;
-import bgu.spl.mics.events.Termination;
-import bgu.spl.mics.events.TickBroadcast;
+import bgu.spl.mics.events.*;
 import javafx.util.Pair;
 
 import javax.swing.text.html.HTMLDocument;
@@ -98,13 +95,8 @@ public class MessageBrokerImpl implements MessageBroker {
 							synchronized (registered.get(currsub)) {
 								if (b instanceof Termination) {
 									clearQueue(currsub);
-									//registered.get(currsub).clear(); // clean the queue so termination will be the next msg
-									registered.get(currsub).put(b); // add b to subscriber queue
 								}
-								if (b instanceof TickBroadcast) {
-									updateTick(currsub, (TickBroadcast) b);
-								}
-
+								registered.get(currsub).put(b); // add b to subscriber queue
 								logM.log.info("%% " + System.currentTimeMillis() + " Broadcast msg added to " + currsub.getName() + " queue");
 							}
 						} catch (InterruptedException ex) {
@@ -138,7 +130,6 @@ public class MessageBrokerImpl implements MessageBroker {
 					Subscriber curr = topics.get(e.getClass()).poll();
 					logM.log.info(" removing " + curr.getName() + " from the round robin loop, size: " + topics.get(e.getClass()).size());
 					logM.log.info("adding msg from type " + e.getClass() + " to "+ curr.getName()+ " queue");
-						//	synchronized (registered.get(curr)) {
 					registered.get(curr).put(e); //add the msg to curr queue
 					topics.get(e.getClass()).put(curr); //add curr to the topic queue
 					logM.log.info(" adding " + curr.getName() + " back to the round robin loop, size: " + topics.get(e.getClass()).size());
@@ -230,7 +221,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 	private void clearQueue(Subscriber currsub){
 		for (Message m : registered.get(currsub)){
-			if (!(m instanceof ExecuteMission | m instanceof GetAgentNamesEvent| m instanceof MissionReceivedEvent )){
+			if ((m instanceof GadgetAvailableEvent | m instanceof AgentsAvailableEvent| m instanceof AbortMission )){
 				registered.get(currsub).remove(m);
 			}
 		}

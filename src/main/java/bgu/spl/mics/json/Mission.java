@@ -17,9 +17,9 @@ public class Mission {
     @SerializedName("gadget")
     @Expose
     private String gadget;
-    @SerializedName("missionName")
+    @SerializedName("name")
     @Expose
-    private String missionName;
+    private String name;
     @SerializedName("timeExpired")
     @Expose
     private Integer timeExpired;
@@ -51,12 +51,12 @@ public class Mission {
         this.gadget = gadget;
     }
 
-    public String getMissionName() {
-        return missionName;
+    public String getname() {
+        return name;
     }
 
-    public void setMissionName(String missionName) {
-        this.missionName = missionName;
+    public void setname(String name) {
+        this.name = name;
     }
 
     public Integer getTimeExpired() {

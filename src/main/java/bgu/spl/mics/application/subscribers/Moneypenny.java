@@ -31,13 +31,15 @@ public class Moneypenny extends Subscriber {
 		logM.log.info("Subscriber " + this.getName() + " initialization");
 		MessageBrokerImpl.getInstance().register(this);
 
-		if (!serialNumber.equals("1")) { //first MP will not handle AgentsAvailableEvent
+		if (Integer.parseInt(serialNumber)%2==0){ // even
+			subscribeToAbortMission();
+			subscribeToExcuteMission();
+			subscribedToGetAgentNamesEvent();
+			subscribeToReleaseAllAgent();
+		}
+		else {
 			subscribeToAgentsAvailableEvent();
 		}
-		subscribeToAbortMission();
-		subscribeToExcuteMission();
-		subscribedToGetAgentNamesEvent();
-		subscribeToBroadCastTermination();
 	}
 
 
@@ -64,10 +66,11 @@ public class Moneypenny extends Subscriber {
 				if (c instanceof ExecuteMission) {
 					try {
 						ExecuteMission event = (ExecuteMission) c;
-					Squad.getInstance().sendAgents(event.getserials(), event.getDuration()*100);
-					logM.log.info("Send agents to Mission");
-					MessageBrokerImpl.getInstance().complete(event, serialNumber);
-				} catch(InterruptedException ex ){terminate();}
+						Squad.getInstance().sendAgents(event.getserials(), event.getDuration() * 100);
+						logM.log.info(getName() + "Send agents to Mission");
+						MessageBrokerImpl.getInstance().complete(event, serialNumber);
+					} catch (InterruptedException e) {logM.log.severe("&&");}
+
 				} else {
 					logM.log.warning("call is not of type ExecuteMission");
 				}
@@ -95,7 +98,6 @@ public class Moneypenny extends Subscriber {
 							MessageBrokerImpl.getInstance().complete(event, null);
 						}
 					} catch (InterruptedException e){
-						System.out.println("getAgent got interrupt");
 						MessageBrokerImpl.getInstance().complete(event, null);
 					}
 				} else {
@@ -137,20 +139,19 @@ public class Moneypenny extends Subscriber {
 		}
 	}
 
-	private void subscribeToBroadCastTermination(){
+	private void subscribeToReleaseAllAgent(){
 		Callback back = new Callback() {
 			@Override
 			public void call(Object c) {
-				if (c instanceof Termination){
-					logM.log.info( getName() + " Got termination msg - termination");
+				if (c instanceof ReleaseAllAgents){
+					logM.log.info( getName() + " Got ReleaseAllAgents msg");
 					releaseAllAgents();
-					terminate();
 				}
 				else
-					logM.log.severe(getName() + " received Broadcastmsg not from Termination type, type was: " + c.getClass());
+					logM.log.severe(getName() + " received msg not from ReleaseAllAgents type, type was: " + c.getClass());
 			}
 		};
-		subscribeBroadcast(Termination.class,back);
+		subscribeEvent(ReleaseAllAgents.class,back);
 	}
 
 }
