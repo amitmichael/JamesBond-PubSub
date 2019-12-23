@@ -62,6 +62,7 @@ public class M extends Subscriber {
 						try {
 							logM.log.info(getName() + ": time left  to process: " + event.getInfo().getMissionName() + " : " + (timeExpired - timeTick) * 100);
 							String resultAgent = (String) futAgent.get((timeExpired - timeTick) * 100, TimeUnit.MILLISECONDS);
+							//String resultAgent = (String) futAgent.get();
 							System.out.println("" + timeTick + " " + resultAgent);
 
 							/////////////try to acquire the gadget//////////////////

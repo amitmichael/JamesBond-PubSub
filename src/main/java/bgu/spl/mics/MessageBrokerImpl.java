@@ -1,9 +1,6 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.events.ExecuteMission;
-import bgu.spl.mics.events.GetAgentNamesEvent;
-import bgu.spl.mics.events.Termination;
-import bgu.spl.mics.events.TickBroadcast;
+import bgu.spl.mics.events.*;
 import javafx.util.Pair;
 
 import javax.swing.text.html.HTMLDocument;
@@ -228,7 +225,7 @@ public class MessageBrokerImpl implements MessageBroker {
 	}
 	private void clearQueue(Subscriber currsub){
 		for (Message m : registered.get(currsub)){
-			if (!(m instanceof ExecuteMission | m instanceof GetAgentNamesEvent| m instanceof MissionReceivedEvent )){
+			if ((m instanceof GadgetAvailableEvent | m instanceof AgentsAvailableEvent| m instanceof AbortMission )){
 				registered.get(currsub).remove(m);
 			}
 		}

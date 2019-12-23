@@ -2,6 +2,7 @@ package bgu.spl.mics.application.publishers;
 
 import bgu.spl.mics.LogManager;
 import bgu.spl.mics.Publisher;
+import bgu.spl.mics.events.ReleaseAllAgents;
 import bgu.spl.mics.events.Termination;
 import bgu.spl.mics.events.TickBroadcast;
 
@@ -42,6 +43,7 @@ public class TimeService extends Publisher {
 			public synchronized void run() {
 				long start = System.currentTimeMillis();
 					if (count <= termination) {
+
 						TickBroadcast toSend = new TickBroadcast(count);
 						logM.log.info("Sending Broadcast msg #" + count + " Time: " + toSend.getTime());
 							getSimplePublisher().sendBroadcast(toSend);
@@ -49,6 +51,9 @@ public class TimeService extends Publisher {
 					}
 					else {
 						timer.cancel();
+
+						logM.log.info("Sending release all agents msg ");
+						getSimplePublisher().sendEvent(new ReleaseAllAgents());
 						getSimplePublisher().sendBroadcast(new Termination());
 					}
 				long end = System.currentTimeMillis();
