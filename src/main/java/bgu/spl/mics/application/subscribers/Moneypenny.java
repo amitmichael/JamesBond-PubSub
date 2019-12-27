@@ -135,6 +135,7 @@ public class Moneypenny extends Subscriber {
 		Map<String, Agent> all = Squad.getInstance().getAgents();
 		logM.log.info("@ Starting releasing all agents");
 		for (Agent a : all.values()){
+			a.terminate();
 			a.release();
 		}
 	}
