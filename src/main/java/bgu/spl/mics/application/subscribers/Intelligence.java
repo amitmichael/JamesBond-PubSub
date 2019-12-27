@@ -53,7 +53,7 @@ public class Intelligence extends Subscriber {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
 						timeTick = msg.getTime();
-						if (timeTick == nextMissionTime) {
+						while (timeTick == nextMissionTime & missions.size()>0) {
 							sendMissions(missions.get(0));
 						}
 					} else {
