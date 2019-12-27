@@ -72,7 +72,7 @@ public class TimeService extends Publisher {
 	@Override
 	public void run() {
 		initialize();
-		timer.schedule(task, 0, 100);
+		timer.schedule(task, 100, 100);
 	}
 }
 

@@ -106,7 +106,6 @@ public class MI6Runner {
 
             }
 
-            sleep(100); //wait to all services finish initialization
             //TimeService
             logM.log.info("Adding " + services.get(3).size() + " executorTime services");
             TimeService timeser = (TimeService) services.get(3).get(0);

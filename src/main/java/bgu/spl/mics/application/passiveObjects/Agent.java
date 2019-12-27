@@ -13,6 +13,7 @@ public class Agent {
 	private String SerialNumber;
 	private boolean available;
 	private LogManager logM = LogManager.getInstance();
+	private boolean teminated = false;
 
 
 	/**
@@ -73,15 +74,21 @@ public class Agent {
 	 */
 	public void acquire() throws InterruptedException {
 		synchronized (this) {
-			while (available == false) {
+			while (available == false & teminated==false) {
 				logM.log.info("Waiting for agent " + this.name + " to be available");
 				wait();
 			}
-
+			if (teminated == true){
+				return;
+			}
 			logM.log.info("agent " + this.name + " acquired, " + System.currentTimeMillis());
 			available = false;
 
 		}
+	}
+
+	public void terminate(){
+		this.teminated=true;
 	}
 
 	/**
