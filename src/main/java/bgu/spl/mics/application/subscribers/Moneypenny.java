@@ -19,7 +19,7 @@ public class Moneypenny extends Subscriber {
 	private String serialNumber;
 	private LogManager logM = LogManager.getInstance();
 	private Squad squad = Squad.getInstance();
-
+	private int timeTick=0;
 
 	public Moneypenny(String serialNumber) {
 		super("MoneyPenny" + serialNumber);
@@ -36,9 +36,11 @@ public class Moneypenny extends Subscriber {
 			subscribeToExcuteMission();
 			subscribedToGetAgentNamesEvent();
 			subscribeToReleaseAllAgent();
+			subscribeToTickBroadCastEvent();
 		}
 		else {
 			subscribeToAgentsAvailableEvent();
+			subscribeToTickBroadCastEvent();
 		}
 	}
 
@@ -67,7 +69,7 @@ public class Moneypenny extends Subscriber {
 					try {
 						ExecuteMission event = (ExecuteMission) c;
 						Squad.getInstance().sendAgents(event.getserials(), event.getDuration() * 100);
-						logM.log.info(getName() + "Send agents to Mission");
+							logM.log.info( "Time: " + timeTick + " "+ getName() + "Send agents to Mission");
 						MessageBrokerImpl.getInstance().complete(event, serialNumber);
 					} catch (InterruptedException e) {logM.log.severe("&&");}
 
@@ -88,11 +90,12 @@ public class Moneypenny extends Subscriber {
 				if (c instanceof AgentsAvailableEvent) {
 					AgentsAvailableEvent event = (AgentsAvailableEvent) c;
 
-					logM.log.info("squad is trying to execute agents");
+					logM.log.info("squad is trying to execute agents for mission : " + event.getMissionname() +" agents: " + Squad.getInstance().getAgentsNames(event.getserials()));
 
 					try  {
 						result = squad.getAgents(event.getserials());
 						if (result == true) {
+							logM.log.info(" agents: " + Squad.getInstance().getAgentsNames(event.getserials())+ " acquired for mission: "+ event.getMissionname() );
 							MessageBrokerImpl.getInstance().complete(event, serialNumber);
 						} else {
 							MessageBrokerImpl.getInstance().complete(event, null);
@@ -115,7 +118,7 @@ public class Moneypenny extends Subscriber {
 			public void call(Object c) throws InterruptedException {
 				if (c instanceof AbortMission) {
 					AbortMission event = (AbortMission) c;
-					logM.log.info("releasing agents");
+					logM.log.info("Time: " + timeTick +  " Abort - releasing agents");
 					squad.releaseAgents(event.getInfo().getSerialAgentsNumbers());//release agents of aborted mission
 					MessageBrokerImpl.getInstance().complete(event, "true");
 				}
@@ -154,6 +157,27 @@ public class Moneypenny extends Subscriber {
 		};
 		subscribeEvent(ReleaseAllAgents.class,back);
 	}
+
+	private void subscribeToTickBroadCastEvent() {
+		Callback tickCallBack = new Callback() {
+			@Override
+			public void call(Object c) {
+				//synchronized (this) {
+					if (c instanceof TickBroadcast) {
+						TickBroadcast msg = (TickBroadcast) c;
+						if (msg.getTime() > timeTick)
+							timeTick = msg.getTime();
+					} else {
+						logM.log.severe("Time: "+ timeTick + " " +getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
+					}
+				}
+			//}
+		};
+		subscribeBroadcast(TickBroadcast.class, tickCallBack);
+
+
+	}
+
 
 }
 

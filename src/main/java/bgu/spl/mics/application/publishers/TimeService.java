@@ -45,7 +45,7 @@ public class TimeService extends Publisher {
 		timer = new Timer();
 		task = new TimerTask() {
 			@Override
-			public synchronized void run() {
+			public void run() {
 				long start = System.currentTimeMillis();
 				if (count <= termination) {
 

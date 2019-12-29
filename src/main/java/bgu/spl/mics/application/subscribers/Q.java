@@ -70,7 +70,7 @@ public class Q extends Subscriber {
 		Callback tickCallBack = new Callback() {
 			@Override
 			public void call(Object c) {
-				synchronized (this) {
+				//synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
 						if (msg.getTime() > timeTick)
@@ -78,7 +78,7 @@ public class Q extends Subscriber {
 					} else {
 						logM.log.severe(getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
 					}
-				}
+				//}
 			}
 		};
 		subscribeBroadcast(TickBroadcast.class, tickCallBack);

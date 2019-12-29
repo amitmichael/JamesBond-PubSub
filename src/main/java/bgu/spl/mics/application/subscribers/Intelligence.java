@@ -49,7 +49,7 @@ public class Intelligence extends Subscriber {
 		Callback tickCallBack = new Callback() {
 			@Override
 			public void call(Object c) throws InterruptedException {
-				synchronized (this) {
+				//synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
 						timeTick = msg.getTime();
@@ -60,7 +60,7 @@ public class Intelligence extends Subscriber {
 						logM.log.severe(getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
 					}
 				}
-			}
+			//}
 		}	;
 		subscribeBroadcast(TickBroadcast.class,tickCallBack);
 

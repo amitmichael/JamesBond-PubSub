@@ -57,7 +57,7 @@ public class M extends Subscriber {
 
 					/////////////try to acquire the agent////////////////////
 					if (timeTick<timeExpired) {
-						Future futAgent = getSimplePublisher().sendEvent(new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers(),(timeExpired-timeTick)*100));
+						Future futAgent = getSimplePublisher().sendEvent(new AgentsAvailableEvent(event.getInfo().getSerialAgentsNumbers(),(timeExpired-timeTick)*100,event.getInfo().getMissionName()));
 						logM.log.info(getName() + " Time: " + timeTick + " " + "Subscriber " + getName() + " sending EventA");
 						try {
 							logM.log.info(getName() + ": time left  to process: " + event.getInfo().getMissionName() + " : " + (timeExpired - timeTick) * 100);
@@ -70,6 +70,10 @@ public class M extends Subscriber {
 								futGadget = getSimplePublisher().sendEvent(new GadgetAvailableEvent(event.getInfo().getGadget()));
 								logM.log.info(getName() + " Time: " + timeTick + " " + "Subscriber " + getName() + " sending EventG");
 								resultGadget = (String) futGadget.get((timeExpired - timeTick) * 100, TimeUnit.MILLISECONDS);
+							}
+							else {
+								MessageBrokerImpl.getInstance().sendEvent(new AbortMission(event.getInfo()));
+								logM.log.warning("Time: " + timeTick + " " + "Subscriber " + getName() + " sending AbortMission due to missing condition: " + event.getInfo().getMissionName());
 							}
 							//////////////////execute mission///////////////////////////
 							if (resultGadget != null) {
@@ -137,7 +141,7 @@ public class M extends Subscriber {
 		Callback tickCallBack = new Callback() {
 			@Override
 			public void call(Object c) {
-				synchronized (this) {
+				//synchronized (this) {
 					if (c instanceof TickBroadcast) {
 						TickBroadcast msg = (TickBroadcast) c;
 						if (msg.getTime() > timeTick)
@@ -146,7 +150,7 @@ public class M extends Subscriber {
 						logM.log.severe("Time: "+ timeTick + " " +getName() + " received Broadcastmsg not from Tick type, type was: " + c.getClass());
 					}
 				}
-			}
+			//}
 		};
 		subscribeBroadcast(TickBroadcast.class, tickCallBack);
 
